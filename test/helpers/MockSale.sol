@@ -5,7 +5,7 @@ import '../../contracts/LOCISale.sol';
 
 contract MockSale is LOCISale {
     function MockSale(
-        address _token,
+        address _token,        
         bool _isPresale,
         uint256 _minFundingGoalWei,
         uint256 _minContributionWei,
@@ -13,7 +13,7 @@ contract MockSale is LOCISale {
         uint256 _start,
         uint256 _durationHours,
         uint256[] _hourBasedDiscounts
-    ) LOCISale(_token, _isPresale, _minFundingGoalWei, _minContributionWei, _maxContributionWei, _start, _durationHours, _hourBasedDiscounts) {}
+    ) LOCISale(_token, 300, _isPresale, _minFundingGoalWei, _minContributionWei, _maxContributionWei, _start, _durationHours, _hourBasedDiscounts) {}
 
     function getTokenAddress() external constant returns (address) {
         return address(token);
@@ -36,4 +36,6 @@ contract MockSale is LOCISale {
     function getWeiForRefund() external constant returns (uint256) {
         return weiForRefund;
     }
+
+
 }

@@ -31,6 +31,7 @@ module.exports = (deployer, network, accounts) => {
     deployer.deploy(LOCIcoin, totalSupply, {from: deployAddress}).then(() => {
         return deployer.deploy(LOCISale,
             LOCIcoin.address,
+            300,
             isPresale,
             new BigNumber(minimumGoal),
             new BigNumber(minimumContribution),

@@ -30,6 +30,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     uint256 public weiRaised;
     uint256 internal weiForRefund;
 
+    uint256 public peggedETHUSD;    
+
     mapping (address => uint256) public contributions;
 
     struct DiscountTranche {
@@ -46,9 +48,11 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     event RefundsEnabled();
     event Refunded(address indexed buyer, uint256 weiAmount);
     event ToppedUp();
+    event PegETHUSD(uint256 pegETHUSD);
 
     function LOCISale(
         address _token,
+        uint256 _peggedETHUSD,
         bool _isPresale,
         uint256 _minFundingGoalWei,
         uint256 _minContributionWei,
@@ -64,6 +68,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         require(_durationHours > 0);
 
         token = LOCIcoin(_token);
+
+        peggedETHUSD = _peggedETHUSD;
 
         isPresale = _isPresale;
 
@@ -167,6 +173,15 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
     // in case we need to return funds to this contract
     function ownerTopUp() external payable {}
+
+    function pegETHUSD(uint256 _peggedETHUSD) onlyOwner public {
+        peggedETHUSD = _peggedETHUSD;
+        PegETHUSD(peggedETHUSD);
+    }
+
+    function peggedETHUSD() constant onlyOwner public returns(uint256) {
+        return peggedETHUSD;
+    }
 
     function ownerEnableRefunds() external onlyOwner {
         // a little protection against human error;

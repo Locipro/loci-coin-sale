@@ -40,6 +40,8 @@ contract('Sale Tests', accounts => {
             72, 15  // next 72 hours, 15% discount
         ];
 
+        let peggedETHUSD = 0;
+
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
@@ -54,6 +56,8 @@ contract('Sale Tests', accounts => {
                 {from: deployAddress});
             owner = await sale.owner.call();
 
+            peggedETHUSD = await sale.peggedETHUSD.call();            
+
             await token.ownerSetOverride(sale.address, true, {from: owner});
         });
 
@@ -62,9 +66,21 @@ contract('Sale Tests', accounts => {
             sale_starting_balance = await token.balanceOf.call(sale.address);
             account_two_starting_balance = await token.balanceOf.call(accounts[1]);
             account_three_starting_balance = await token.balanceOf.call(accounts[2]);
+
+            await sale.pegETHUSD(300, {from: owner});
+        });
+
+        it("should have a peggedETHUSD", async () => {
+            assert.equal((await sale.peggedETHUSD.call()).toNumber(), 300, "default peggedETHUSD does not match");
+
+            await sale.pegETHUSD(330, {from: owner});
+
+            assert.equal((await sale.peggedETHUSD.call()).toNumber(), 330, "default peggedETHUSD does not match");
         });
 
         it("should have the correct initial settings", async () => {
+            assert.equal((await sale.peggedETHUSD.call()).toNumber(), 300, "default peggedETHUSD does not match");
+
             assert.equal(token.address, await sale.getTokenAddress.call(), "token addresses do not match");
             assert.equal(owner, accounts[0], "owner address does not match accounts[0]");
             assert.equal(owner, await token.owner.call(), "owner addresses do not match");
