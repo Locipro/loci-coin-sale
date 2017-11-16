@@ -1,0 +1,27 @@
+{
+  "name": "LOCIcoin",
+  "version": "1.0.0",
+  "description": "In the interests of public disclosure, we're please to present the Unity Coin contracts.",
+  "repository": "https://github.com/locipro/LOCIcoin-sale",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "babel-register": "^6.26.0"
+  },
+  "dependencies": {
+    "babel-polyfill": "^6.26.0",
+    "babel-preset-env": "^1.6.0",
+    "bignumber.js": "^4.1.0",
+    "truffle": "^3.4.11",
+    "yargs": "^10.0.3",
+    "zeppelin-solidity": "^1.3.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT"
+}
