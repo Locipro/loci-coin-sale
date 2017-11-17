@@ -45,7 +45,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     DiscountTranche[] internal discountTranches;
     uint8 internal currentDiscountTrancheIndex = 0;
 
-    event ContributionReceived(address indexed buyer, bool indexed presale, uint8 indexed rate, uint256 value, uint256 tokens);
+    event ContributionReceived(address indexed buyer, bool presale, uint8 rate, uint256 value, uint256 tokens);
     event RefundsEnabled();
     event Refunded(address indexed buyer, uint256 weiAmount);
     event ToppedUp();
@@ -124,11 +124,11 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         return rate;*/
 
-        var (the_end, the_rate, the_round) = determineDiscountTranche();
+        var (the_rate, the_round) = determineDiscountTranche();
         return the_rate;
     }
 
-    function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
+    function determineDiscountTranche() internal returns (uint8, uint8) {
         uint256 the_end = 0;
         uint8 the_rate = 0;
         uint8 the_round = 0;
@@ -158,7 +158,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             }
         }
 
-        return (the_end, the_rate, the_round);
+        return (the_rate, the_round);
     }
 
     function () public payable whenNotPaused {
@@ -185,9 +185,11 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
         uint256 tokens = weiContribution.mul(peggedETHUSD);
         uint8 rate = determineDiscountRate();
-        if (rate > 0)
-            tokens = tokens.mul(SafeMath.add(rate, 100)).div(100);
-
+        if (rate > 0)            
+            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(rate));
+            //tokens = SafeMath.div(SafeMath.mul(SafeMath.mul(weiContribution,peggedETHUSD),100),rate);
+                            
+/*
         if (tokens > tokensRemaining) {
             // there aren't enough tokens to fill the contribution amount,
             // so recalculate the contribution amount
@@ -197,7 +199,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             else
                 weiContribution = tokens.div(peggedETHUSD);
         }
-
+*/
         // add the contributed wei to any existing value for the sender
         contributions[msg.sender] = contributions[msg.sender].add(weiContribution);
         ContributionReceived(msg.sender, isPresale, rate, weiContribution, tokens);

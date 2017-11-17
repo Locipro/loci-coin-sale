@@ -104,8 +104,8 @@ contract('Sale Tests', accounts => {
                 try {
                     trancheEnd = await sale.getDiscountTrancheEnd.call(i);
                     trancheDiscount = await sale.getDiscountTrancheDiscount.call(i);
-                    console.log('trancheEnd:' + trancheEnd);
-                    console.log('trancheDiscount:' + trancheDiscount);
+                    //console.log('trancheEnd:' + trancheEnd);
+                    //console.log('trancheDiscount:' + trancheDiscount);
                 } catch (error) {
                     break;
                 }
@@ -163,11 +163,29 @@ contract('Sale Tests', accounts => {
             let discount_rate = discounts[1];
             //let non_discounted_expected = new BigNumber(5000 * web3.toWei(1, 'ether'));
             let pegETHUSD = await sale.peggedETHUSD.call();
-            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );            
+
+            let acutal_ending_balance =  (new_balance_tokens.minus(account_two_starting_balance)).toNumber();
+            let discount_balance_expected = (actual_contribution_wei.times(peggedETHUSD.times(new BigNumber(100).dividedBy(discount_rate))));
+
+            
+            /*console.log('discount_rate:' + discount_rate);
+            console.log('new_balance_tokens:' + new_balance_tokens);
+            console.log('pegETHUSD:' + pegETHUSD);
+            console.log('old_balance_wei:'+ old_balance_wei);
+            console.log('new_balance_wei:'+ new_balance_wei);
+            console.log('cost:'+ cost);
+            console.log('actual_contribution_wei:'+ actual_contribution_wei);
+            console.log('new_balance_tokens:'+ new_balance_tokens);
+            console.log('account_two_starting_balance:'+ account_two_starting_balance);
+            console.log('acutal_ending_balance:' + acutal_ending_balance);
+            console.log('discount_balance_expected:' + discount_balance_expected);
+            */
+            
 
             assert.equal(
-                (new_balance_tokens.minus(account_two_starting_balance)).toNumber(),
-                (discount_rate > 0 ? (non_discounted_expected.times(100 + discount_rate).dividedBy(new BigNumber(100))) : non_discounted_expected).toNumber(),
+                new_balance_tokens,
+                (discount_rate > 0 ? discount_balance_expected : non_discounted_expected).toNumber(),
                 "Should max out at appropriate number of tokens for the first tranche discount rate");
         });
 
@@ -255,10 +273,33 @@ contract('Sale Tests', accounts => {
             let pegETHUSD = await sale.peggedETHUSD.call();
             let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
 
+            let acutal_ending_balance =  (new_balance_tokens.minus(account_three_starting_balance)).toNumber();
+            let discount_balance_expected = (actual_contribution_wei.times(peggedETHUSD.times(new BigNumber(100).dividedBy(discount_rate))));
+
+            /*
+            console.log('discount_rate:' + discount_rate);
+            console.log('new_balance_tokens:' + new_balance_tokens);
+            console.log('pegETHUSD:' + pegETHUSD);
+            console.log('old_balance_wei:'+ old_balance_wei);
+            console.log('new_balance_wei:'+ new_balance_wei);
+            console.log('cost:'+ cost);
+            console.log('actual_contribution_wei:'+ actual_contribution_wei);
+            console.log('new_balance_tokens:'+ new_balance_tokens);
+            console.log('account_two_starting_balance:'+ account_two_starting_balance);
+            console.log('acutal_ending_balance:' + acutal_ending_balance);
+            console.log('discount_balance_expected:' + discount_balance_expected);
+            */
+
+            assert.equal(
+                acutal_ending_balance,
+                (discount_rate > 0 ? discount_balance_expected : non_discounted_expected).toNumber(),
+                "Should max out at appropriate number of tokens for the second tranche discount rate");
+
+/*
             assert.equal(
                 (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),
-                (discount_rate > 0 ? (non_discounted_expected.times(100 + discount_rate).dividedBy(new BigNumber(100))) : non_discounted_expected).toNumber(),
-                "Should max out at appropriate number of tokens for the second tranche discount rate");
+                (discount_rate > 0 ? actual_contribution_wei.times(peggedETHUSD.dividedBy(discount_rate).dividedBy(100)) : non_discounted_expected).toNumber(),
+                "Should max out at appropriate number of tokens for the second tranche discount rate");*/
         });
 
         it("should revert to zero discount after all tranche end dates have been passed", async () => {
@@ -293,6 +334,8 @@ contract('Sale Tests', accounts => {
             //let non_discounted_expected = new BigNumber(4000 * web3.toWei(1, 'ether'));
             let pegETHUSD = await sale.peggedETHUSD.call();
             let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
+
+            //console.log('discount_rate:' + 0);
 
             assert.equal(
                 (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),
@@ -424,7 +467,7 @@ contract('Sale Tests', accounts => {
 
         let hours = 24; // 1 day in hours
 
-        let peggedETHUSD = 300;
+        let peggedETHUSD = 330;
         let reservedTokens = 0;
 
         before(async () => {
