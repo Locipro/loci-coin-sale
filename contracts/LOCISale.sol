@@ -20,10 +20,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
     bool public isPresale;
     bool public isRefunding = false;
-
-    //todo remove
-    uint16 internal constant tokenToWeiMultiplier = 10000;
-
+    
     uint256 public minFundingGoalWei;
     uint256 public minContributionWei;
     uint256 public maxContributionWei;
@@ -127,14 +124,14 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         return rate;*/
 
-        var (end, rate, round) = determineDiscountTranche();
-        return rate;
+        var (the_end, the_rate, the_round) = determineDiscountTranche();
+        return the_rate;
     }
 
     function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
-        uint256 end = 0;
-        uint8 rate = 0;
-        uint8 round = 0;
+        uint256 the_end = 0;
+        uint8 the_rate = 0;
+        uint8 the_round = 0;
 
         if (currentDiscountTrancheIndex < discountTranches.length) {
             DiscountTranche storage d = discountTranches[currentDiscountTrancheIndex];
@@ -155,13 +152,13 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             // if the index is still valid, then we must have
             // a valid tranche, so return discount rate
             if (currentDiscountTrancheIndex < discountTranches.length) {
-                end = d.end;
-                rate = d.discount;
-                round = d.round;
+                the_end = d.end;
+                the_rate = d.discount;
+                the_round = d.round;
             }
         }
 
-        return (end, rate, round);
+        return (the_end, the_rate, the_round);
     }
 
     function () public payable whenNotPaused {
@@ -176,7 +173,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         require(weiContributionAllowed > 0);
 
         // are limited by the number of tokens remaining
-        uint256 tokensRemaining = token.balanceOf(address(this));
+        uint256 tokensRemaining = token.balanceOf(address(this)).sub( reservedTokens );
         require(tokensRemaining > 0);
 
         // limit contribution's value based on max/previous contributions
@@ -185,7 +182,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             weiContribution = weiContributionAllowed;
 
         // calculate token amount to be created
-        uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
+        //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
+        uint256 tokens = weiContribution.mul(peggedETHUSD);
         uint8 rate = determineDiscountRate();
         if (rate > 0)
             tokens = tokens.mul(SafeMath.add(rate, 100)).div(100);
@@ -195,9 +193,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             // so recalculate the contribution amount
             tokens = tokensRemaining;
             if (rate > 0)
-                weiContribution = tokens.mul(100).div(SafeMath.mul(tokenToWeiMultiplier, SafeMath.add(rate, 100)));
+                weiContribution = tokens.mul(100).div(SafeMath.mul(peggedETHUSD, SafeMath.add(rate, 100)));
             else
-                weiContribution = tokens.div(tokenToWeiMultiplier);
+                weiContribution = tokens.div(peggedETHUSD);
         }
 
         // add the contributed wei to any existing value for the sender

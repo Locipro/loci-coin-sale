@@ -161,7 +161,9 @@ contract('Sale Tests', accounts => {
             let new_balance_tokens = await token.balanceOf.call(accounts[1]);
 
             let discount_rate = discounts[1];
-            let non_discounted_expected = new BigNumber(5000 * web3.toWei(1, 'ether'));
+            //let non_discounted_expected = new BigNumber(5000 * web3.toWei(1, 'ether'));
+            let pegETHUSD = await sale.peggedETHUSD.call();
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
 
             assert.equal(
                 (new_balance_tokens.minus(account_two_starting_balance)).toNumber(),
@@ -249,7 +251,9 @@ contract('Sale Tests', accounts => {
             let new_balance_tokens = await token.balanceOf.call(accounts[2]);
 
             let discount_rate = discounts[3];
-            let non_discounted_expected = new BigNumber(1000 * web3.toWei(1, 'ether'));
+            //let non_discounted_expected = new BigNumber(1000 * web3.toWei(1, 'ether'));
+            let pegETHUSD = await sale.peggedETHUSD.call();
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
 
             assert.equal(
                 (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),
@@ -286,7 +290,9 @@ contract('Sale Tests', accounts => {
 
             let new_balance_tokens = await token.balanceOf.call(accounts[2]);
 
-            let non_discounted_expected = new BigNumber(4000 * web3.toWei(1, 'ether'));
+            //let non_discounted_expected = new BigNumber(4000 * web3.toWei(1, 'ether'));
+            let pegETHUSD = await sale.peggedETHUSD.call();
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
 
             assert.equal(
                 (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),
