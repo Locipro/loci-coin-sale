@@ -7,6 +7,9 @@ const BigNumber = require('bignumber.js');
 
 module.exports = (deployer, network, accounts) => {
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
+    let peggedETHUSD = 300;
+    let reservedTokens = 0;// if 4 million tokens, use 4,000,000 with 18 more zeros. then it would be 4 * Math.pow(10,8) * Math.pow(10,18)*/ 
+
     if (network === 'development') {
         deployAddress = accounts[0];
         totalSupply = new BigNumber(4 * Math.pow(10,9) * Math.pow(10,18)); //
@@ -31,7 +34,8 @@ module.exports = (deployer, network, accounts) => {
     deployer.deploy(LOCIcoin, totalSupply, {from: deployAddress}).then(() => {
         return deployer.deploy(LOCISale,
             LOCIcoin.address,
-            300,
+            peggedETHUSD,
+            reservedTokens,
             isPresale,
             new BigNumber(minimumGoal),
             new BigNumber(minimumContribution),

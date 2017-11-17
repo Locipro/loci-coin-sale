@@ -31,7 +31,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     uint256 public weiRaised;
     uint256 internal weiForRefund;
 
-    uint256 public peggedETHUSD;    
+    uint256 public peggedETHUSD;
+    uint256 public reservedTokens;     // if 4 million tokens, use 4,000,000 with 18 more zeros. then it would be 4 * Math.pow(10,8) * Math.pow(10,18)*/    
 
     mapping (address => uint256) public contributions;
 
@@ -56,6 +57,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     function LOCISale(
         address _token,
         uint256 _peggedETHUSD,
+        uint256 _reservedTokens,
         bool _isPresale,
         uint256 _minFundingGoalWei,
         uint256 _minContributionWei,
@@ -73,6 +75,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         token = LOCIcoin(_token);
 
         peggedETHUSD = _peggedETHUSD;
+        reservedTokens = _reservedTokens;
 
         isPresale = _isPresale;
 

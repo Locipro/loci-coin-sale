@@ -41,12 +41,14 @@ contract('Sale Tests', accounts => {
         ];
 
         let peggedETHUSD = 300;
+        let reservedTokens = 0;
 
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
@@ -417,12 +419,14 @@ contract('Sale Tests', accounts => {
         let hours = 24; // 1 day in hours
 
         let peggedETHUSD = 300;
+        let reservedTokens = 0;
 
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
@@ -570,12 +574,14 @@ contract('Sale Tests', accounts => {
         let hours = 24; // 1 day in hours
 
         let peggedETHUSD = 300;
+        let reservedTokens = 0;
 
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
@@ -802,12 +808,14 @@ contract('Sale Tests', accounts => {
         let hours = 24; // 1 days in hours
 
         let peggedETHUSD = 300;
+        let reservedTokens = 0;
 
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
