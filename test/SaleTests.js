@@ -36,8 +36,8 @@ contract('Sale Tests', accounts => {
 
         let hours = 130; // 5 days in hours + 10 hours for 0% discount testing
         let discounts = [
-            48, 25,  // first 48 hours, 25% discount
-            72, 15  // next 72 hours, 15% discount
+            48, 33, // first 48 hours, 0.33 price
+            72, 44  // next 72 hours,  0.44 price
         ];
 
         let peggedETHUSD = 300;
@@ -102,6 +102,8 @@ contract('Sale Tests', accounts => {
                 try {
                     trancheEnd = await sale.getDiscountTrancheEnd.call(i);
                     trancheDiscount = await sale.getDiscountTrancheDiscount.call(i);
+                    console.log('trancheEnd:' + trancheEnd);
+                    console.log('trancheDiscount:' + trancheDiscount);
                 } catch (error) {
                     break;
                 }
@@ -202,7 +204,7 @@ contract('Sale Tests', accounts => {
             let new_discount = await sale.getDiscountTrancheDiscount(new_index);
             assert.equal(_index + 1, new_index.toNumber(), "tranche index wasn't incremented");
             assert.notEqual(discount, new_discount, "tranche discount is the same as previous tranche discount");
-            assert.equal(new_discount, 15, "tranche discount isn't correct");
+            assert.equal(new_discount, discounts[3], "tranche discount isn't correct");
         });
 
         it("should prevent any further contribution from someone who has hit their max limit", async () => {

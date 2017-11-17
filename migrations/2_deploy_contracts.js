@@ -17,8 +17,8 @@ module.exports = (deployer, network, accounts) => {
         isPresale = true;
         hours = 120; // 5 days in hours
         discounts = [
-            48, 25,  // first 48 hours, 25% discount
-            72, 15  // next 72 hours, 15% discount
+            48, 33,  // first 48 hours, 25% discount
+            72, 44  // next 72 hours, 15% discount
         ];
     }
 
