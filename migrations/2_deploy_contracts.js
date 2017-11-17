@@ -12,7 +12,7 @@ module.exports = (deployer, network, accounts) => {
         totalSupply = new BigNumber(4 * Math.pow(10,9) * Math.pow(10,18)); //
         minimumGoal = new BigNumber(2 * Math.pow(10,18)); // 2 ETH in wei
         minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
-        maximumContribution = new BigNumber(0.5 * Math.pow(10,18)); // 0.5 ETH in wei;
+        maximumContribution = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei;
         start = Math.ceil((new Date()).getTime() / 1000);
         isPresale = true;
         hours = 120; // 5 days in hours

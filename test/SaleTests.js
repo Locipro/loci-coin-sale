@@ -40,12 +40,13 @@ contract('Sale Tests', accounts => {
             72, 15  // next 72 hours, 15% discount
         ];
 
-        let peggedETHUSD = 0;
+        let peggedETHUSD = 300;
 
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
+                new BigNumber(peggedETHUSD),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
@@ -413,10 +414,13 @@ contract('Sale Tests', accounts => {
 
         let hours = 24; // 1 day in hours
 
+        let peggedETHUSD = 300;
+
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
+                new BigNumber(peggedETHUSD),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
@@ -563,10 +567,13 @@ contract('Sale Tests', accounts => {
 
         let hours = 24; // 1 day in hours
 
+        let peggedETHUSD = 300;
+
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
+                new BigNumber(peggedETHUSD),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
@@ -792,10 +799,13 @@ contract('Sale Tests', accounts => {
 
         let hours = 24; // 1 days in hours
 
+        let peggedETHUSD = 300;
+
         before(async () => {
             token = await Token.new(totalTokenSupply, {from: deployAddress});
             sale = await Sale.new(
                 token.address,
+                new BigNumber(peggedETHUSD),
                 isPresale,
                 new BigNumber(minimumGoal),
                 new BigNumber(minimumContribution),
