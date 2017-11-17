@@ -21,6 +21,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     bool public isPresale;
     bool public isRefunding = false;
 
+    //todo remove
     uint16 internal constant tokenToWeiMultiplier = 10000;
 
     uint256 public minFundingGoalWei;
@@ -40,6 +41,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint256 end;
         // should be a % number between 0 and 100
         uint8 discount;
+        // should be 1, 2, 3, 4, etc...
+        uint8 round;
     }
     DiscountTranche[] internal discountTranches;
     uint8 internal currentDiscountTrancheIndex = 0;
@@ -90,12 +93,12 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             // the calculated tranche end cannot go past the crowdsale end
             require(_end <= end);
 
-            discountTranches.push(DiscountTranche(_end, uint8(_hourBasedDiscounts[i + 1])));
+            discountTranches.push(DiscountTranche(_end, uint8(_hourBasedDiscounts[i + 1]), uint8(i+1)));
         }
     }
 
     function determineDiscountRate() internal returns (uint8) {
-        uint8 rate = 0;
+        /*uint8 rate = 0;
 
         if (currentDiscountTrancheIndex < discountTranches.length) {
             DiscountTranche storage d = discountTranches[currentDiscountTrancheIndex];
@@ -119,7 +122,43 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
                 rate = d.discount;
         }
 
+        return rate;*/
+
+        var (end, rate, round) = determineDiscountTranche();
         return rate;
+    }
+
+    function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
+        uint256 end = 0;
+        uint8 rate = 0;
+        uint8 round = 0;
+
+        if (currentDiscountTrancheIndex < discountTranches.length) {
+            DiscountTranche storage d = discountTranches[currentDiscountTrancheIndex];
+            if (d.end < now) {
+                // find the next applicable tranche
+                while (++currentDiscountTrancheIndex < discountTranches.length) {
+                    d = discountTranches[currentDiscountTrancheIndex];
+
+                    // this should always true on the first iteration of the
+                    // while loop; it would have to be a ghost town of a
+                    // crowdsale to jump past a tranche level (ie. multiple
+                    // loop iterations here)
+                    if (d.end > now)
+                        break;
+                }
+            }
+
+            // if the index is still valid, then we must have
+            // a valid tranche, so return discount rate
+            if (currentDiscountTrancheIndex < discountTranches.length) {
+                end = d.end;
+                rate = d.discount;
+                round = d.round;
+            }
+        }
+
+        return (end, rate, round);
     }
 
     function () public payable whenNotPaused {
