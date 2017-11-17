@@ -189,17 +189,17 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(rate));
             //tokens = SafeMath.div(SafeMath.mul(SafeMath.mul(weiContribution,peggedETHUSD),100),rate);
                             
-/*
+
         if (tokens > tokensRemaining) {
             // there aren't enough tokens to fill the contribution amount,
             // so recalculate the contribution amount
             tokens = tokensRemaining;
             if (rate > 0)
-                weiContribution = tokens.mul(100).div(SafeMath.mul(peggedETHUSD, SafeMath.add(rate, 100)));
+                weiContribution = tokens.mul(uint256(rate)).div(100).div(peggedETHUSD);
             else
                 weiContribution = tokens.div(peggedETHUSD);
         }
-*/
+
         // add the contributed wei to any existing value for the sender
         contributions[msg.sender] = contributions[msg.sender].add(weiContribution);
         ContributionReceived(msg.sender, isPresale, rate, weiContribution, tokens);
