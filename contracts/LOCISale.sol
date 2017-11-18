@@ -97,38 +97,12 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         }
     }
 
-    function determineDiscountRate() internal returns (uint8) {
-        /*uint8 rate = 0;
-
-        if (currentDiscountTrancheIndex < discountTranches.length) {
-            DiscountTranche storage d = discountTranches[currentDiscountTrancheIndex];
-            if (d.end < now) {
-                // find the next applicable tranche
-                while (++currentDiscountTrancheIndex < discountTranches.length) {
-                    d = discountTranches[currentDiscountTrancheIndex];
-
-                    // this should always true on the first iteration of the
-                    // while loop; it would have to be a ghost town of a
-                    // crowdsale to jump past a tranche level (ie. multiple
-                    // loop iterations here)
-                    if (d.end > now)
-                        break;
-                }
-            }
-
-            // if the index is still valid, then we must have
-            // a valid tranche, so return discount rate
-            if (currentDiscountTrancheIndex < discountTranches.length)
-                rate = d.discount;
-        }
-
-        return rate;*/
-
-        var (the_rate, the_round) = determineDiscountTranche();
+    function determineDiscountRate() internal returns (uint8) {        
+        var (the_end, the_rate, the_round) = determineDiscountTranche();
         return the_rate;
     }
 
-    function determineDiscountTranche() internal returns (uint8, uint8) {
+    function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
         uint256 the_end = 0;
         uint8 the_rate = 0;
         uint8 the_round = 0;
@@ -158,7 +132,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             }
         }
 
-        return (the_rate, the_round);
+        return (the_end, the_rate, the_round);
     }
 
     function () public payable whenNotPaused {
