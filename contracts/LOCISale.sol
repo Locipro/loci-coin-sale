@@ -15,22 +15,23 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     LOCIcoin internal token;
 
     // UNIX timestamp (UTC) based start and end, inclusive
-    uint256 public start;
-    uint256 public end;
+    uint256 public start;               /* UTC of timestamp that the sale will start based on the value passed in at the time of construction */
+    uint256 public end;                 /* UTC of computed time that the sale will end based on the hours passed in at time of construction */
 
-    bool public isPresale;
-    bool public isRefunding = false;
+    bool public isPresale;              /* For LOCI this will be false. We raised pre-ICO offline. */
+    bool public isRefunding = false;    /* No plans to refund. */
     
-    uint256 public minFundingGoalWei;
-    uint256 public minContributionWei;
-    uint256 public maxContributionWei;
+    uint256 public minFundingGoalWei;   /* we can set this to zero, but we might want to raise at least 20000 Ether */
+    uint256 public minContributionWei;  /* individual contribution min. we require at least a 0.1 Ether investment, for example. */
+    uint256 public maxContributionWei;  /* individual contribution max. probably don't want someone to buy more than 60000 Ether */
 
-    uint256 public weiRaised;
-    uint256 internal weiForRefund;
+    uint256 public weiRaised;       /* total of all weiContributions */
+    uint256 public weiRaisedAfterDiscounts; /* wei raised after the discount periods end */
+    uint256 internal weiForRefund;  /* only applicable if we enable refunding, if we don't meet our expected raise */  
 
-    uint256 public peggedETHUSD;
-    uint256 public reservedTokens;     /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
-    uint256 public baseRateInCents;
+    uint256 public peggedETHUSD;    /* In whole dollars. $300 means use 300 */
+    uint256 public reservedTokens;  /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
+    uint256 public baseRateInCents; /* $2.50 means use 250 */
 
     mapping (address => uint256) public contributions;
 
@@ -42,9 +43,12 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint8 discount;
         // should be 1, 2, 3, 4, etc...
         uint8 round;
+        // amount raised during tranche in wei
+        uint256 roundWeiRaised;
     }
     DiscountTranche[] internal discountTranches;
     uint8 internal currentDiscountTrancheIndex = 0;
+    uint8 internal discountTrancheLength = 0;
 
     event ContributionReceived(address indexed buyer, bool presale, uint8 rate, uint256 value, uint256 tokens);
     event RefundsEnabled();
@@ -90,6 +94,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // this will throw if the # of hours and
         // discount % don't come in pairs
         uint256 _end = start;
+
+        uint tranche_round = 0;
+
         for (uint i = 0; i < _hourBasedDiscounts.length; i += 2) {
             // calculate the timestamp where the discount rate will end
             _end = _end.add(_hourBasedDiscounts[i].mul(1 hours));
@@ -97,7 +104,11 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             // the calculated tranche end cannot go past the crowdsale end
             require(_end <= end);
 
-            discountTranches.push(DiscountTranche(_end, uint8(_hourBasedDiscounts[i + 1]), uint8(i+1)));
+            tranche_round += 1;
+
+            discountTranches.push(DiscountTranche(_end, uint8(_hourBasedDiscounts[i + 1]), uint8(tranche_round), 0));
+
+            discountTrancheLength = uint8(i+1);
         }
     }
 
@@ -122,8 +133,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
                     // while loop; it would have to be a ghost town of a
                     // crowdsale to jump past a tranche level (ie. multiple
                     // loop iterations here)
-                    if (d.end > now)
+                    if (d.end > now) {
                         break;
+                    }
                 }
             }
 
@@ -133,6 +145,10 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
                 the_end = d.end;
                 the_rate = d.discount;
                 the_round = d.round;
+            } else {
+                the_end = end;
+                the_rate = 0;
+                the_round = discountTrancheLength + 1;
             }
         }
 
@@ -162,34 +178,39 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // calculate token amount to be created
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
         uint256 tokens = weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
-        uint8 rate = determineDiscountRate();
-        if (rate > 0)            
-            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(rate));
-            //tokens = SafeMath.div(SafeMath.mul(SafeMath.mul(weiContribution,peggedETHUSD),100),rate);
-                            
+        var (the_end, the_rate, the_round) = determineDiscountTranche();
+        if (the_rate > 0) {
+            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(the_rate));
+        }                            
 
         if (tokens > tokensRemaining) {
-            // there aren't enough tokens to fill the contribution amount,
-            // so recalculate the contribution amount
+            // there aren't enough tokens to fill the contribution amount, so recalculate the contribution amount
             tokens = tokensRemaining;
-            if (rate > 0)
-                weiContribution = tokens.mul(uint256(rate)).div(100).div(peggedETHUSD);
+            if (the_rate > 0)
+                weiContribution = tokens.mul(uint256(the_rate)).div(100).div(peggedETHUSD);
             else
                 weiContribution = tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);
         }
 
         // add the contributed wei to any existing value for the sender
         contributions[msg.sender] = contributions[msg.sender].add(weiContribution);
-        ContributionReceived(msg.sender, isPresale, rate, weiContribution, tokens);
+        ContributionReceived(msg.sender, isPresale, the_rate, weiContribution, tokens);
 
         require(token.transfer(msg.sender, tokens));
 
-        weiRaised = weiRaised.add(weiContribution);
+        weiRaised = weiRaised.add(weiContribution); //total of all weiContributions
+
+        if( discountTrancheLength > 0 && the_round > 0 && the_round <= discountTrancheLength ) {
+            discountTranches[the_round-1].roundWeiRaised = discountTranches[the_round-1].roundWeiRaised.add(weiContribution);
+        }  
+        if( discountTrancheLength > 0 && the_round > discountTrancheLength ) {
+            weiRaisedAfterDiscounts = weiRaisedAfterDiscounts.add(weiContribution);
+        }
 
         uint256 _weiRefund = msg.value.sub(weiContribution);
         if (_weiRefund > 0)
             require(msg.sender.call.value(_weiRefund)());
-    }
+    }    
 
     // in case we need to return funds to this contract
     function ownerTopUp() external payable {}
@@ -201,6 +222,19 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
     function peggedETHUSD() constant onlyOwner public returns(uint256) {
         return peggedETHUSD;
+    }
+
+    function weiRaisedDuringRound(uint8 round) constant onlyOwner public returns(uint256) {
+        require( round > 0 && round <= discountTrancheLength );
+        return discountTranches[round-1].roundWeiRaised;
+    }
+
+    function weiRaisedAfterDiscountRounds() constant onlyOwner public returns(uint256) {
+        return weiRaisedAfterDiscounts;
+    }
+
+    function totalWeiRaised() constant onlyOwner public returns(uint256) {
+        return weiRaised;
     }
 
     function ownerEnableRefunds() external onlyOwner {

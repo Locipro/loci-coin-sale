@@ -170,8 +170,8 @@ contract('Sale Tests', accounts => {
             let acutal_ending_balance =  (new_balance_tokens.minus(account_two_starting_balance)).toNumber();
             let discount_balance_expected = (actual_contribution_wei.times(peggedETHUSD.times(new BigNumber(100).dividedBy(discount_rate))));
 
-            
-            /*console.log('discount_rate:' + discount_rate);
+            /*
+            console.log('discount_rate:' + discount_rate);
             console.log('new_balance_tokens:' + new_balance_tokens);
             console.log('pegETHUSD:' + pegETHUSD);
             console.log('old_balance_wei:'+ old_balance_wei);
@@ -181,9 +181,22 @@ contract('Sale Tests', accounts => {
             console.log('new_balance_tokens:'+ new_balance_tokens);
             console.log('account_two_starting_balance:'+ account_two_starting_balance);
             console.log('acutal_ending_balance:' + acutal_ending_balance);
-            console.log('discount_balance_expected:' + discount_balance_expected);
+            console.log('discount_balance_expected:' + discount_balance_expected);            
             */
             
+            let valid = true;
+            try {
+                await sale.weiRaisedDuringRound.call(0);
+                valid = false;
+            } catch (error) {}
+            assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
+
+            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();
+            console.log('weiRaisedDuringRound 1:' + actual_contribution_wei );
+            assert.equal(weiRaisedDuringRound1, actual_contribution_wei, 'weiRaisedDuringRound 1');
+            
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            console.log('totalWeiRaised:' + totalWeiRaised);
 
             assert.equal(
                 new_balance_tokens,
@@ -247,10 +260,11 @@ contract('Sale Tests', accounts => {
 
         it("should allow minimum individual contribution; verifies second tranche discount", async () => {
             let old_balance_wei = web3.eth.getBalance(accounts[2]);
+            let oneTenthEtherInWei = web3.toWei(0.1, 'ether');
             let hash = web3.eth.sendTransaction({
                 from: accounts[2],
                 to: sale.address,
-                value: web3.toWei(0.1, 'ether'),
+                value: oneTenthEtherInWei,
                 gas: 150000
             });
             //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
@@ -292,16 +306,28 @@ contract('Sale Tests', accounts => {
             console.log('discount_balance_expected:' + discount_balance_expected);
             */
 
+            let valid = true;
+            try {
+                await sale.weiRaisedDuringRound.call(0);
+                valid = false;
+            } catch (error) {}
+            assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
+
+            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();            
+            console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );            
+
+            let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
+            console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            assert.equal(weiRaisedDuringRound2, actual_contribution_wei, 'weiRaisedDuringRound 2');
+
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            console.log('totalWeiRaised:' + totalWeiRaised);
+
             assert.equal(
                 acutal_ending_balance,
                 (discount_rate > 0 ? discount_balance_expected : non_discounted_expected).toNumber(),
                 "Should max out at appropriate number of tokens for the second tranche discount rate");
 
-/*
-            assert.equal(
-                (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),
-                (discount_rate > 0 ? actual_contribution_wei.times(peggedETHUSD.dividedBy(discount_rate).dividedBy(100)) : non_discounted_expected).toNumber(),
-                "Should max out at appropriate number of tokens for the second tranche discount rate");*/
         });
 
         it("should revert to zero discount after all tranche end dates have been passed", async () => {
@@ -336,8 +362,33 @@ contract('Sale Tests', accounts => {
             //let non_discounted_expected = new BigNumber(4000 * web3.toWei(1, 'ether'));
             let pegETHUSD = await sale.peggedETHUSD.call();
             let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD * new BigNumber(100).dividedBy(baseRateInCents));            
+            
+            let valid = true;
+            try {
+                await sale.weiRaisedDuringRound.call(0);
+                valid = false;
+            } catch (error) {}
+            assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
 
-            //console.log('discount_rate:' + 0);
+            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();            
+            console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );            
+
+            let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
+            console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            assert.equal(weiRaisedDuringRound2, web3.toWei(0.1, 'ether'), 'weiRaisedDuringRound 2 from this user should be limited - (excess refunded)');
+                    
+            try {
+                await sale.weiRaisedDuringRound.call(3);
+                valid = false;
+            } catch (error) {}
+            assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
+
+            let weiRaisedAfterAllDiscounts = (await sale.weiRaisedAfterDiscountRounds.call()).toNumber();
+            console.log('weiRaisedAfterDiscounts:' + weiRaisedAfterAllDiscounts );
+            assert.equal(weiRaisedAfterAllDiscounts, web3.toWei(0.4, 'ether'), 'weiRaisedAfterAllDiscounts');
+
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            console.log('totalWeiRaised:' + totalWeiRaised);
 
             assert.equal(
                 (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),
