@@ -5,14 +5,16 @@ import '../../contracts/LOCISale.sol';
 
 contract MockSale is LOCISale {
     function MockSale(
-        address _token, uint256 _peggedETHUSD, uint256 _reservedTokens,
-        bool _isPresale,
-        uint256 _minFundingGoalWei,
-        uint256 _minContributionWei,
-        uint256 _maxContributionWei,
-        uint256 _start,
-        uint256 _durationHours,
-        uint256[] _hourBasedDiscounts
+        address _token,                 /* LOCIcoin contract address */
+        uint256 _peggedETHUSD,          /* 300 = 300 USD */
+        uint256 _reservedTokens,        /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
+        bool _isPresale,                /* For LOCI this will be false. Presale offline, and accounted for in reservedTokens */
+        uint256 _minFundingGoalWei,     /* If we are looking to raise a minimum amount of wei, put it here */
+        uint256 _minContributionWei,    /* For LOCI this will be 0.1 ETH */
+        uint256 _maxContributionWei,    /* Advisable to not let a single contributor go over the max alloted, say 63333 * Math.pow(10,18) wei. */
+        uint256 _start,                 /* For LOCI this will be */
+        uint256 _durationHours,         /* Total length of the sale, in hours */
+        uint256[] _hourBasedDiscounts   /* Single dimensional array of pairs [hours, rateInCents, hours, rateInCents, hours, rateInCents, ... ] */
     ) LOCISale(_token, _peggedETHUSD, _reservedTokens, _isPresale, _minFundingGoalWei, 
         _minContributionWei, _maxContributionWei, _start, _durationHours, _hourBasedDiscounts) {}
 
