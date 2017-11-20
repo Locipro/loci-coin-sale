@@ -29,7 +29,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     uint256 internal weiForRefund;
 
     uint256 public peggedETHUSD;
-    uint256 public reservedTokens;     // if 4 million tokens, use 4,000,000 with 18 more zeros. then it would be 4 * Math.pow(10,8) * Math.pow(10,18)*/    
+    uint256 public reservedTokens;     /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
+    uint256 public baseRateInCents;
 
     mapping (address => uint256) public contributions;
 
@@ -61,6 +62,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint256 _maxContributionWei,    /* Advisable to not let a single contributor go over the max alloted, say 63333 * Math.pow(10,18) wei. */
         uint256 _start,                 /* For LOCI this will be */
         uint256 _durationHours,         /* Total length of the sale, in hours */
+        uint256 _baseRateInCents,       /* Base rate in cents. $2.50 would be 250 */
         uint256[] _hourBasedDiscounts   /* Single dimensional array of pairs [hours, rateInCents, hours, rateInCents, hours, rateInCents, ... ] */
     ) public {
         require(_token != 0x0);
@@ -82,6 +84,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         minFundingGoalWei = _minFundingGoalWei;
         minContributionWei = _minContributionWei;
         maxContributionWei = _maxContributionWei;
+
+        baseRateInCents = _baseRateInCents;
 
         // this will throw if the # of hours and
         // discount % don't come in pairs
@@ -157,7 +161,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         // calculate token amount to be created
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
-        uint256 tokens = weiContribution.mul(peggedETHUSD);
+        uint256 tokens = weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
         uint8 rate = determineDiscountRate();
         if (rate > 0)            
             tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(rate));
@@ -171,7 +175,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             if (rate > 0)
                 weiContribution = tokens.mul(uint256(rate)).div(100).div(peggedETHUSD);
             else
-                weiContribution = tokens.div(peggedETHUSD);
+                weiContribution = tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);
         }
 
         // add the contributed wei to any existing value for the sender

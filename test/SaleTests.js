@@ -24,6 +24,7 @@ contract('Sale Tests', accounts => {
     // restarting testrpc
     let start = web3.eth.getBlock('latest').timestamp;
     let discounts = []; // no tranche discounting
+    let baseRateInCents = 250; /* Base rate in cents. $1.00 would be 100 */
 
     contract('Basics', accounts => {
         let isPresale = true;
@@ -55,6 +56,7 @@ contract('Sale Tests', accounts => {
                 new BigNumber(maximumContribution),
                 new BigNumber(start),
                 new BigNumber(hours),
+                new BigNumber(baseRateInCents),
                 discounts.map(v => new BigNumber(v)),
                 {from: deployAddress});
             owner = await sale.owner.call();
@@ -163,7 +165,7 @@ contract('Sale Tests', accounts => {
             let discount_rate = discounts[1];
             //let non_discounted_expected = new BigNumber(5000 * web3.toWei(1, 'ether'));
             let pegETHUSD = await sale.peggedETHUSD.call();
-            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );            
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD * new BigNumber(100).dividedBy(baseRateInCents));            
 
             let acutal_ending_balance =  (new_balance_tokens.minus(account_two_starting_balance)).toNumber();
             let discount_balance_expected = (actual_contribution_wei.times(peggedETHUSD.times(new BigNumber(100).dividedBy(discount_rate))));
@@ -271,7 +273,7 @@ contract('Sale Tests', accounts => {
             let discount_rate = discounts[3];
             //let non_discounted_expected = new BigNumber(1000 * web3.toWei(1, 'ether'));
             let pegETHUSD = await sale.peggedETHUSD.call();
-            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD * new BigNumber(100).dividedBy(baseRateInCents));            
 
             let acutal_ending_balance =  (new_balance_tokens.minus(account_three_starting_balance)).toNumber();
             let discount_balance_expected = (actual_contribution_wei.times(peggedETHUSD.times(new BigNumber(100).dividedBy(discount_rate))));
@@ -333,7 +335,7 @@ contract('Sale Tests', accounts => {
 
             //let non_discounted_expected = new BigNumber(4000 * web3.toWei(1, 'ether'));
             let pegETHUSD = await sale.peggedETHUSD.call();
-            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD );
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD * new BigNumber(100).dividedBy(baseRateInCents));            
 
             //console.log('discount_rate:' + 0);
 
@@ -482,6 +484,7 @@ contract('Sale Tests', accounts => {
                 new BigNumber(maximumContribution),
                 new BigNumber(start),
                 new BigNumber(hours),
+                new BigNumber(baseRateInCents),
                 discounts.map(v => new BigNumber(v)),
                 {from: deployAddress});
             owner = await sale.owner.call();
@@ -637,6 +640,7 @@ contract('Sale Tests', accounts => {
                 new BigNumber(maximumContribution),
                 new BigNumber(start),
                 new BigNumber(hours),
+                new BigNumber(baseRateInCents),
                 discounts.map(v => new BigNumber(v)),
                 {from: deployAddress});
             owner = await sale.owner.call();
@@ -871,6 +875,7 @@ contract('Sale Tests', accounts => {
                 new BigNumber(maximumContribution),
                 new BigNumber(start),
                 new BigNumber(hours),
+                new BigNumber(baseRateInCents),
                 discounts.map(v => new BigNumber(v)),
                 {from: deployAddress});
             owner = await sale.owner.call();
