@@ -2,10 +2,11 @@ pragma solidity ^0.4.15;
 
 import 'zeppelin-solidity/contracts/token/StandardToken.sol';
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
+import 'zeppelin-solidity/contracts/ownership/Contactable.sol';
 import './IRefundHandler.sol';
 
 
-contract LOCIcoin is StandardToken, Ownable {
+contract LOCIcoin is StandardToken, Ownable, Contactable {
     string public name = "";
     string public symbol = "";
     uint256 public constant decimals = 18;
@@ -103,4 +104,5 @@ contract LOCIcoin is StandardToken, Ownable {
         balances[owner] = balances[owner].add(_balance);
         Transfer(msg.sender, owner, _balance);
     }
+    
 }
