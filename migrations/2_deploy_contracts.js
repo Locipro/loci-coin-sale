@@ -7,17 +7,19 @@ const BigNumber = require('bignumber.js');
 
 module.exports = (deployer, network, accounts) => {
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
-    let peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
-    let reservedTokens = 0; // if 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18)*/ 
-    let baseRateInCents = 250; // $2.50 equals 250 cents
+    let peggedETHUSD, reservedTokens, baseRateInCents;     
 
     if (network === 'development') {
+        peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
+
         deployAddress = accounts[0];
-        totalSupply = new BigNumber(4 * Math.pow(10,9) * Math.pow(10,18)); //
-        minimumGoal = new BigNumber(2 * Math.pow(10,18)); // 2 ETH in wei
+        totalSupply =    new BigNumber(100000000 * Math.pow(10,18)); // 100Million
+        reservedTokens = new BigNumber( 54000000 * Math.pow(10,18)); // 54Million (50M reserve + 4M presale)
+        minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
         minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
         maximumContribution = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei;
         start = Math.ceil((new Date()).getTime() / 1000);
+        baseRateInCents = 250; // $2.50 equals 250 cents
         isPresale = true;
         hours = 120; // 5 days in hours
         discounts = [

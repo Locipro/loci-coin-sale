@@ -24,7 +24,56 @@ contract('Sale Tests', accounts => {
     // restarting testrpc
     let start = web3.eth.getBlock('latest').timestamp;
     let discounts = []; // no tranche discounting
-    let baseRateInCents = 250; /* Base rate in cents. $1.00 would be 100 */
+    let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */
+
+    contract('LOCISale specific tests', accounts => {
+        let isPresale = false;
+        let minimumGoal = web3.toWei(50000, 'ether');
+        let minimumContribution = 0.1 * web3.toWei(1, 'ether');
+        let maximumContribution = 50000 * web3.toWei(1, 'ether');
+
+        let totalTokenSupply = 100 * Math.pow(10,8) * web3.toWei(1, 'ether'); // 100 Million in wei
+        let reservedTokens = 54 * Math.pow(10,8) * web3.toWei(1, 'ether');    //  54 Million in wei = (50M + 4M presale)
+        let peggedETHUSD = 300; // $300 USD
+        //let saleSupplyAllocation = 30000 * web3.toWei(1, 'ether');
+
+        let hours = 130; // 5 days in hours + 10 hours for 0% discount testing
+        let discounts = [
+            48, 33, // first 48 hours, 0.33 price
+            72, 44  // next 72 hours,  0.44 price
+        ];
+
+        before(async () => {
+            token = await Token.new(totalTokenSupply, {from: deployAddress});
+            sale = await Sale.new(
+                token.address,
+                new BigNumber(peggedETHUSD),
+                new BigNumber(reservedTokens),
+                isPresale,
+                new BigNumber(minimumGoal),
+                new BigNumber(minimumContribution),
+                new BigNumber(maximumContribution),
+                new BigNumber(start),
+                new BigNumber(hours),
+                new BigNumber(baseRateInCents),
+                discounts.map(v => new BigNumber(v)),
+                {from: deployAddress});
+            owner = await sale.owner.call();
+
+            peggedETHUSD = await sale.peggedETHUSD.call();            
+
+            await token.ownerSetOverride(sale.address, true, {from: owner});
+        });
+
+        beforeEach(async () => {
+            owner_starting_balance = await token.balanceOf.call(owner);
+            sale_starting_balance = await token.balanceOf.call(sale.address);
+            account_two_starting_balance = await token.balanceOf.call(accounts[1]);
+            account_three_starting_balance = await token.balanceOf.call(accounts[2]);
+
+            await sale.pegETHUSD(300, {from: owner});
+        });
+    })
 
     contract('Basics', accounts => {
         let isPresale = true;
@@ -192,11 +241,11 @@ contract('Sale Tests', accounts => {
             assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
 
             let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();
-            console.log('weiRaisedDuringRound 1:' + actual_contribution_wei );
+            //console.log('weiRaisedDuringRound 1:' + actual_contribution_wei );
             assert.equal(weiRaisedDuringRound1, actual_contribution_wei, 'weiRaisedDuringRound 1');
             
             let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
-            console.log('totalWeiRaised:' + totalWeiRaised);
+            //console.log('totalWeiRaised:' + totalWeiRaised);
 
             assert.equal(
                 new_balance_tokens,
@@ -314,14 +363,14 @@ contract('Sale Tests', accounts => {
             assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
 
             let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();            
-            console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );            
+            //console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );            
 
             let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
-            console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            //console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
             assert.equal(weiRaisedDuringRound2, actual_contribution_wei, 'weiRaisedDuringRound 2');
 
             let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
-            console.log('totalWeiRaised:' + totalWeiRaised);
+            //console.log('totalWeiRaised:' + totalWeiRaised);
 
             assert.equal(
                 acutal_ending_balance,
@@ -371,10 +420,10 @@ contract('Sale Tests', accounts => {
             assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
 
             let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();            
-            console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );            
+            //console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );            
 
             let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
-            console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            //console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
             assert.equal(weiRaisedDuringRound2, web3.toWei(0.1, 'ether'), 'weiRaisedDuringRound 2 from this user should be limited - (excess refunded)');
                     
             try {
@@ -384,11 +433,11 @@ contract('Sale Tests', accounts => {
             assert(valid, "weiRaisedDuringRound uses logical round counts > 0 and <= trancheDiscount.length ");
 
             let weiRaisedAfterAllDiscounts = (await sale.weiRaisedAfterDiscountRounds.call()).toNumber();
-            console.log('weiRaisedAfterDiscounts:' + weiRaisedAfterAllDiscounts );
+            //console.log('weiRaisedAfterDiscounts:' + weiRaisedAfterAllDiscounts );
             assert.equal(weiRaisedAfterAllDiscounts, web3.toWei(0.4, 'ether'), 'weiRaisedAfterAllDiscounts');
 
             let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
-            console.log('totalWeiRaised:' + totalWeiRaised);
+            //console.log('totalWeiRaised:' + totalWeiRaised);
 
             assert.equal(
                 (new_balance_tokens.minus(account_three_starting_balance)).toNumber(),

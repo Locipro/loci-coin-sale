@@ -1,11 +1,13 @@
-›Compiling ./contracts/IRefundHandler.sol...
-Compiling ./contracts/Migrations.sol...
+Using network 'development'.
+
+Compiling ./contracts/IRefundHandler.sol...
 Compiling ./contracts/LOCISale.sol...
 Compiling ./contracts/LOCIcoin.sol...
 Compiling ./test/helpers/MockSale.sol...
 Compiling ./test/helpers/MockToken.sol...
 Compiling zeppelin-solidity/contracts/lifecycle/Pausable.sol...
 Compiling zeppelin-solidity/contracts/math/SafeMath.sol...
+Compiling zeppelin-solidity/contracts/ownership/Contactable.sol...
 Compiling zeppelin-solidity/contracts/ownership/Ownable.sol...
 Compiling zeppelin-solidity/contracts/token/BasicToken.sol...
 Compiling zeppelin-solidity/contracts/token/ERC20.sol...
@@ -14,19 +16,7 @@ Compiling zeppelin-solidity/contracts/token/StandardToken.sol...
 
 Compilation warnings encountered:
 
-/Users/demmons/sandbox/LOCIcoin/contracts/Migrations.sol:11:3: Warning: No visibility specified. Defaulting to "public".
-  function Migrations() {
-  ^
-Spanning multiple lines.
-,/Users/demmons/sandbox/LOCIcoin/contracts/Migrations.sol:15:3: Warning: No visibility specified. Defaulting to "public".
-  function setCompleted(uint completed) restricted {
-  ^
-Spanning multiple lines.
-,/Users/demmons/sandbox/LOCIcoin/contracts/Migrations.sol:19:3: Warning: No visibility specified. Defaulting to "public".
-  function upgrade(address new_address) restricted {
-  ^
-Spanning multiple lines.
-,zeppelin-solidity/contracts/ownership/Ownable.sol:20:3: Warning: No visibility specified. Defaulting to "public".
+zeppelin-solidity/contracts/ownership/Ownable.sol:20:3: Warning: No visibility specified. Defaulting to "public".
   function Ownable() {
   ^
 Spanning multiple lines.
@@ -38,20 +28,29 @@ Spanning multiple lines.
   function decreaseApproval (address _spender, uint _subtractedValue)
   ^
 Spanning multiple lines.
-,/Users/demmons/sandbox/LOCIcoin/test/helpers/MockSale.sol:7:5: Warning: No visibility specified. Defaulting to "public".
+,/Users/demmons/sandbox/locicoin/test/helpers/MockSale.sol:7:5: Warning: No visibility specified. Defaulting to "public".
     function MockSale(
     ^
 Spanning multiple lines.
-,/Users/demmons/sandbox/LOCIcoin/test/helpers/MockToken.sol:7:5: Warning: No visibility specified. Defaulting to "public".
+,/Users/demmons/sandbox/locicoin/test/helpers/MockToken.sol:7:5: Warning: No visibility specified. Defaulting to "public".
     function MockToken(uint256 _totalSupply) LOCIcoin(_totalSupply){}
-    ^-----------------------------------------------------------------^
-,/Users/demmons/sandbox/LOCIcoin/test/helpers/MockSale.sol:25:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
+    ^---------------------------------------------------------------^
+,/Users/demmons/sandbox/locicoin/contracts/LOCISale.sol:116:14: Warning: Unused local variable.
+        var (the_end, the_rate, the_round) = determineDiscountTranche();
+             ^-----^
+,/Users/demmons/sandbox/locicoin/contracts/LOCISale.sol:116:33: Warning: Unused local variable.
+        var (the_end, the_rate, the_round) = determineDiscountTranche();
+                                ^-------^
+,/Users/demmons/sandbox/locicoin/contracts/LOCISale.sol:181:14: Warning: Unused local variable.
+        var (the_end, the_rate, the_round) = determineDiscountTranche();
+             ^-----^
+,/Users/demmons/sandbox/locicoin/test/helpers/MockSale.sol:29:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
         determineDiscountRate(); // just to trigger the check and update
         ^---------------------^
-,/Users/demmons/sandbox/LOCIcoin/test/helpers/MockSale.sol:29:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
+,/Users/demmons/sandbox/locicoin/test/helpers/MockSale.sol:33:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
         determineDiscountRate(); // just to trigger the check and update
         ^---------------------^
-,/Users/demmons/sandbox/LOCIcoin/test/helpers/MockSale.sol:33:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
+,/Users/demmons/sandbox/locicoin/test/helpers/MockSale.sol:37:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
         determineDiscountRate(); // just to trigger the check and update
         ^---------------------^
 ,zeppelin-solidity/contracts/math/SafeMath.sol:9:3: Warning: Function state mutability can be restricted to pure
@@ -75,86 +74,87 @@ Spanning multiple lines.
 [0m[0m
 [0m  Contract: Sale Tests[0m
 [0m    Contract: Basics[0m
-    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (148ms)[0m
-    [32m  ✓[0m[90m should have sane discount tranche values[0m[31m (223ms)[0m
-    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (80ms)[0m
-    [32m  ✓[0m[90m should throw exception when less than minimum contribution[0m[31m (317ms)[0m
-    [32m  ✓[0m[90m should cap ether at max individual contribution (refund remaining ether & allocate max contribution # of tokens); verifies first tranche discount[0m[31m (862ms)[0m
-    [32m  ✓[0m[90m should not allow owner to transfer wei before minimum goal is met[0m[31m (342ms)[0m
-    [32m  ✓[0m[90m should not allow owner to recover unsold tokens before end of sale[0m[31m (334ms)[0m
-    [32m  ✓[0m[90m should have non-zero balance but still less than minimum goal after first successful transaction attempt[0m[31m (323ms)[0m
-    [32m  ✓[0m[90m should move to the second discount tranche when advancing time[0m[31m (155ms)[0m
-    [32m  ✓[0m[90m should prevent any further contribution from someone who has hit their max limit[0m[31m (172ms)[0m
-    [32m  ✓[0m[90m should allow minimum individual contribution; verifies second tranche discount[0m[31m (838ms)[0m
-    [32m  ✓[0m[90m should revert to zero discount after all tranche end dates have been passed[0m[31m (874ms)[0m
-    [32m  ✓[0m[90m should approach minimum goal without exceeding[0m[31m (418ms)[0m
-    [32m  ✓[0m[90m should equal minimum goal[0m[31m (392ms)[0m
-    [32m  ✓[0m[90m should allow owner to transfer wei after minimum goal is met[0m[31m (333ms)[0m
-    [32m  ✓[0m[90m should not allow owner to transfer wei to invalid addresses[0m[31m (346ms)[0m
-    [32m  ✓[0m[90m should not allow owner to recover unsold tokens to invalid addresses[0m[31m (103ms)[0m
-    [32m  ✓[0m[90m should exceed minimum goal[0m[31m (389ms)[0m
-    [32m  ✓[0m[90m should stop allowing contributions after the sale end date[0m[31m (209ms)[0m
-    [32m  ✓[0m[90m should allow ether top-up after the sale end date[0m[31m (343ms)[0m
+    [32m  ✓[0m[90m should have a peggedETHUSD[0m[31m (130ms)[0m
+    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (163ms)[0m
+    [32m  ✓[0m[90m should have sane discount tranche values[0m[31m (318ms)[0m
+    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (104ms)[0m
+    [32m  ✓[0m[90m should throw exception when less than minimum contribution[0m[31m (432ms)[0m
+    [32m  ✓[0m[90m should cap ether at max individual contribution (refund remaining ether & allocate max contribution # of tokens); verifies first tranche discount[0m[31m (1112ms)[0m
+    [32m  ✓[0m[90m should not allow owner to transfer wei before minimum goal is met[0m[31m (347ms)[0m
+    [32m  ✓[0m[90m should not allow owner to recover unsold tokens before end of sale[0m[31m (341ms)[0m
+    [32m  ✓[0m[90m should have non-zero balance but still less than minimum goal after first successful transaction attempt[0m[31m (326ms)[0m
+    [32m  ✓[0m[90m should move to the second discount tranche when advancing time[0m[31m (183ms)[0m
+    [32m  ✓[0m[90m should prevent any further contribution from someone who has hit their max limit[0m[31m (196ms)[0m
+    [32m  ✓[0m[90m should allow minimum individual contribution; verifies second tranche discount[0m[31m (1052ms)[0m
+    [32m  ✓[0m[90m should revert to zero discount after all tranche end dates have been passed[0m[31m (1143ms)[0m
+    [32m  ✓[0m[90m should approach minimum goal without exceeding[0m[31m (449ms)[0m
+    [32m  ✓[0m[90m should equal minimum goal[0m[31m (448ms)[0m
+    [32m  ✓[0m[90m should allow owner to transfer wei after minimum goal is met[0m[31m (373ms)[0m
+    [32m  ✓[0m[90m should not allow owner to transfer wei to invalid addresses[0m[31m (391ms)[0m
+    [32m  ✓[0m[90m should not allow owner to recover unsold tokens to invalid addresses[0m[31m (117ms)[0m
+    [32m  ✓[0m[90m should exceed minimum goal[0m[31m (422ms)[0m
+    [32m  ✓[0m[90m should stop allowing contributions after the sale end date[0m[31m (186ms)[0m
+    [32m  ✓[0m[90m should allow ether top-up after the sale end date[0m[31m (360ms)[0m
 [0m    Contract: Goal met, no minimum[0m
-    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (111ms)[0m
-    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (85ms)[0m
-    [32m  ✓[0m[90m should allow a contribution[0m[31m (504ms)[0m
-    [32m  ✓[0m[90m should not allow token recovery before end of sale[0m[33m (69ms)[0m
-    [32m  ✓[0m[90m should not allow wei withdrawal by non-owner[0m
-    [32m  ✓[0m[90m should allow wei withdrawal by owner at any time (because there is no minimum goal)[0m[31m (625ms)[0m
-    [32m  ✓[0m[90m should not allow wei withdrawal by non-owner after sale end data either[0m[33m (44ms)[0m
-    [32m  ✓[0m[90m should not allow token recovery by non-owner[0m[33m (44ms)[0m
-    [32m  ✓[0m[90m should not allow token recovery to an invalid address (token address or 0x0)[0m[33m (68ms)[0m
-    [32m  ✓[0m[90m should allow wei withdrawal by owner after sale end date[0m[31m (630ms)[0m
-    [32m  ✓[0m[90m should allow owner token recovery after end of sale[0m[31m (83ms)[0m
+    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (130ms)[0m
+    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (80ms)[0m
+    [32m  ✓[0m[90m should allow a contribution[0m[31m (547ms)[0m
+    [32m  ✓[0m[90m should not allow token recovery before end of sale[0m[31m (81ms)[0m
+    [32m  ✓[0m[90m should not allow wei withdrawal by non-owner[0m[33m (38ms)[0m
+    [32m  ✓[0m[90m should allow wei withdrawal by owner at any time (because there is no minimum goal)[0m[31m (655ms)[0m
+    [32m  ✓[0m[90m should not allow wei withdrawal by non-owner after sale end data either[0m[33m (63ms)[0m
+    [32m  ✓[0m[90m should not allow token recovery by non-owner[0m[33m (59ms)[0m
+    [32m  ✓[0m[90m should not allow token recovery to an invalid address (token address or 0x0)[0m[33m (66ms)[0m
+    [32m  ✓[0m[90m should allow wei withdrawal by owner after sale end date[0m[31m (632ms)[0m
+    [32m  ✓[0m[90m should allow owner token recovery after end of sale[0m[31m (138ms)[0m
 [0m    Contract: Goal met, no minimum, refunding prorata[0m
-    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (138ms)[0m
-    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (92ms)[0m
-    [32m  ✓[0m[90m should allow contributions[0m[31m (948ms)[0m
-    [32m  ✓[0m[90m should allow wei withdrawal by owner at any time (because there is no minimum goal)[0m[31m (625ms)[0m
-    [32m  ✓[0m[90m should prevent enabling refunding without pausing or being after end of sale[0m[33m (46ms)[0m
-    [32m  ✓[0m[90m should prevent pausing if non-owner[0m[33m (42ms)[0m
-    [32m  ✓[0m[90m should allow pausing sale[0m[33m (59ms)[0m
-    [32m  ✓[0m[90m should not allow any contributions after pausing[0m[31m (446ms)[0m
-    [32m  ✓[0m[90m should allow enabling refunding after pausing sale[0m[31m (292ms)[0m
-    [32m  ✓[0m[90m should prevent pausing if already paused[0m[33m (64ms)[0m
-    [32m  ✓[0m[90m should not allow any contributions while refunding and paused[0m[31m (448ms)[0m
-    [32m  ✓[0m[90m should prevent unpausing if non-owner[0m[33m (43ms)[0m
-    [32m  ✓[0m[90m should not allow any contributions while refunding, even after unpausing[0m[31m (507ms)[0m
-    [32m  ✓[0m[90m should have proper token and eth balances for participants after refunding complete[0m[31m (2174ms)[0m
+    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (169ms)[0m
+    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (81ms)[0m
+    [32m  ✓[0m[90m should allow contributions[0m[31m (1146ms)[0m
+    [32m  ✓[0m[90m should allow wei withdrawal by owner at any time (because there is no minimum goal)[0m[31m (662ms)[0m
+    [32m  ✓[0m[90m should prevent enabling refunding without pausing or being after end of sale[0m[33m (64ms)[0m
+    [32m  ✓[0m[90m should prevent pausing if non-owner[0m[33m (71ms)[0m
+    [32m  ✓[0m[90m should allow pausing sale[0m[31m (86ms)[0m
+    [32m  ✓[0m[90m should not allow any contributions after pausing[0m[31m (461ms)[0m
+    [32m  ✓[0m[90m should allow enabling refunding after pausing sale[0m[31m (316ms)[0m
+    [32m  ✓[0m[90m should prevent pausing if already paused[0m[33m (53ms)[0m
+    [32m  ✓[0m[90m should not allow any contributions while refunding and paused[0m[31m (463ms)[0m
+    [32m  ✓[0m[90m should prevent unpausing if non-owner[0m[33m (50ms)[0m
+    [32m  ✓[0m[90m should not allow any contributions while refunding, even after unpausing[0m[31m (529ms)[0m
+    [32m  ✓[0m[90m should have proper token and eth balances for participants after refunding complete[0m[31m (2206ms)[0m
 [0m    Contract: Goal not met, refunding[0m
-    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (109ms)[0m
-    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[33m (66ms)[0m
-    [32m  ✓[0m[90m should remain below minimal goal after insufficient ether contributions[0m[31m (1122ms)[0m
-    [32m  ✓[0m[90m should prevent enabling refunding without pausing or being after end of sale[0m[33m (51ms)[0m
+    [32m  ✓[0m[90m should have the correct initial settings[0m[31m (147ms)[0m
+    [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (97ms)[0m
+    [32m  ✓[0m[90m should remain below minimal goal after insufficient ether contributions[0m[31m (1173ms)[0m
+    [32m  ✓[0m[90m should prevent enabling refunding without pausing or being after end of sale[0m[33m (55ms)[0m
     [32m  ✓[0m[90m should stop allowing contributions after the sale end date[0m[31m (193ms)[0m
-    [32m  ✓[0m[90m should allow ether top-up after the sale end date and before enabling refunds[0m[31m (334ms)[0m
-    [32m  ✓[0m[90m should allow refunding when minimum goal not met[0m[31m (109ms)[0m
-    [32m  ✓[0m[90m should prevent enabling refunding a second time[0m[33m (52ms)[0m
-    [32m  ✓[0m[90m should throw exception if invalid sale address is used by valid contributor[0m
-    [32m  ✓[0m[90m should prevent non-contributor from getting ether from the refund process[0m
-    [32m  ✓[0m[90m should allow contributor to get ether from the refund process in exchange for their tokens[0m[31m (969ms)[0m
+    [32m  ✓[0m[90m should allow ether top-up after the sale end date and before enabling refunds[0m[31m (348ms)[0m
+    [32m  ✓[0m[90m should allow refunding when minimum goal not met[0m[31m (119ms)[0m
+    [32m  ✓[0m[90m should prevent enabling refunding a second time[0m[31m (76ms)[0m
+    [32m  ✓[0m[90m should throw exception if invalid sale address is used by valid contributor[0m[33m (57ms)[0m
+    [32m  ✓[0m[90m should prevent non-contributor from getting ether from the refund process[0m[33m (44ms)[0m
+    [32m  ✓[0m[90m should allow contributor to get ether from the refund process in exchange for their tokens[0m[31m (913ms)[0m
     [32m  ✓[0m[90m should prevent already-refunded contributors from requesting refund again[0m
-    [32m  ✓[0m[90m should have proper token and eth balances for participants after refunding complete[0m[31m (561ms)[0m
+    [32m  ✓[0m[90m should have proper token and eth balances for participants after refunding complete[0m[31m (621ms)[0m
 
 [0m  Contract: Token Tests[0m
   [32m  ✓[0m[90m should have the owner account set correctly[0m
-  [32m  ✓[0m[90m should have blank name and symbol[0m[33m (47ms)[0m
+  [32m  ✓[0m[90m should have blank name and symbol[0m[33m (60ms)[0m
   [32m  ✓[0m[90m should have correct totalSupply[0m
   [32m  ✓[0m[90m should put correct # of Token in the owner account[0m
-  [32m  ✓[0m[90m should add an account as an override address[0m[31m (225ms)[0m
-  [32m  ✓[0m[90m should successfully transfer tokens from owner account before ownerActivateToken[0m[31m (162ms)[0m
-  [32m  ✓[0m[90m should successfully transfer tokens from an override account before ownerActivateToken[0m[31m (145ms)[0m
+  [32m  ✓[0m[90m should add an account as an override address[0m[31m (227ms)[0m
+  [32m  ✓[0m[90m should successfully transfer tokens from owner account before ownerActivateToken[0m[31m (224ms)[0m
+  [32m  ✓[0m[90m should successfully transfer tokens from an override account before ownerActivateToken[0m[31m (167ms)[0m
   [32m  ✓[0m[90m should fail to transfer tokens from non-owner/non-override account before ownerActivateToken[0m
   [32m  ✓[0m[90m should fail to approve token transfer from non-owner/non-override account before ownerActivateToken[0m
-  [32m  ✓[0m[90m should approve token transfer from owner/override account before ownerActivateToken[0m[31m (562ms)[0m
-  [32m  ✓[0m[90m should be allowed to transferFrom successfully an approved amount from a non owner/override account[0m[31m (169ms)[0m
+  [32m  ✓[0m[90m should approve token transfer from owner/override account before ownerActivateToken[0m[31m (141ms)[0m
+  [32m  ✓[0m[90m should be allowed to transferFrom successfully an approved amount from a non owner/override account[0m[31m (155ms)[0m
   [32m  ✓[0m[90m should throw when calling ownerActivateToken without ownerSetVisible[0m
-  [32m  ✓[0m[90m should have blank symbol and token before, and be set after ownerSetVisible[0m[31m (161ms)[0m
-  [32m  ✓[0m[90m should be inactive before, and be active after ownerActivateToken[0m[31m (81ms)[0m
-  [32m  ✓[0m[90m non-owner account should transfer token correctly after ownerActivateToken[0m[31m (113ms)[0m
-  [32m  ✓[0m[90m should fail to transfer tokens to 0x0 or the token's address[0m[33m (66ms)[0m
+  [32m  ✓[0m[90m should have blank symbol and token before, and be set after ownerSetVisible[0m[31m (198ms)[0m
+  [32m  ✓[0m[90m should be inactive before, and be active after ownerActivateToken[0m[31m (85ms)[0m
+  [32m  ✓[0m[90m non-owner account should transfer token correctly after ownerActivateToken[0m[31m (94ms)[0m
+  [32m  ✓[0m[90m should fail to transfer tokens to 0x0 or the token's address[0m[33m (61ms)[0m
 
 
-[92m [0m[32m 74 passing[0m[90m (29s)[0m
+[92m [0m[32m 75 passing[0m[90m (34s)[0m
 
