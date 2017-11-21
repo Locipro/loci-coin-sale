@@ -193,14 +193,14 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint256 tokens = weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
         var (the_end, the_rate, the_round) = determineDiscountTranche();
         if (the_rate > 0) {
-            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(the_rate));            
+            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(the_rate);            
         }                            
 
         if (tokens > tokensRemaining) {
             // there aren't enough tokens to fill the contribution amount, so recalculate the contribution amount
             tokens = tokensRemaining;
             if (the_rate > 0)
-                weiContribution = tokens.mul(uint256(the_rate)).div(100).div(peggedETHUSD);
+                weiContribution = tokens.mul(the_rate).div(100).div(peggedETHUSD);
             else
                 weiContribution = tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);    
         }                    
