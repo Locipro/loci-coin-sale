@@ -24,13 +24,13 @@ contract('Sale Tests', accounts => {
     let start = web3.eth.getBlock('latest').timestamp;
     let discounts = []; // no tranche discounting
     let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */    
-    let hardCapETHInWei = new BigNumber( 64000 * Math.pow(10,18) );
+    let hardCapETHInWei = new BigNumber( 63333 * Math.pow(10,18) );
 
     contract('LOCISale hard cap ETH in wei', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
-        let maximumContribution = 50000 * web3.toWei(1, 'ether');
+        let maximumContribution = 70000 * web3.toWei(1, 'ether'); // make this larger than the hardCap
 
         let totalTokenSupply =     web3.toWei(100000000, 'ether'); // 100 Million in wei
         let reservedTokens = web3.toWei(0, 'ether');    //  4 Million in wei = (4M tokens presale)
@@ -92,8 +92,76 @@ contract('Sale Tests', accounts => {
             let hardCapETHInWei_value_in_ether = new BigNumber(hardCapETHInWei_value).dividedBy( Math.pow(10,18) );
             //console.log('hardCapETHInWei_value', hardCapETHInWei_value);
             //console.log('hardCapETHInWei_value_in_ether', hardCapETHInWei_value_in_ether);
+            assert.equal(hardCapETHInWei_value_in_ether, 63333, "hardCapETHInWei not set");           
+        });
 
-            assert.equal(hardCapETHInWei_value_in_ether, 64000, "hardCapETHInWei not set");           
+        it("should allow purchase up to the max tokens available & without going over hardCap", async () => {
+            let old_balance_wei = web3.eth.getBalance(accounts[1]);
+            let hash = web3.eth.sendTransaction({
+                from: accounts[1],
+                to: sale.address,
+                value: web3.toWei(70000, 'ether'),
+                gas: 1500000
+            });                        
+
+            // calculate the cost of the gas used
+            let tx = web3.eth.getTransaction(hash);
+            let txr = web3.eth.getTransactionReceipt(hash);
+            let cost = tx.gasPrice * txr.gasUsed;
+
+            let new_balance_wei = web3.eth.getBalance(accounts[1]);
+
+            let new_balance_tokens = await token.balanceOf.call(accounts[1]);                                                    
+            //console.log(new_balance_tokens);
+
+            assert.equal(
+                Math.round( new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ) ), 50000000,
+                "Should have ~50000000 tokens due to ETH hard cap");
+        });
+
+        it("should have correct weiContributions accounted for", async () => {
+            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();
+            //console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );
+            let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
+            //console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            let weiRaisedDuringRound3 = (await sale.weiRaisedDuringRound.call(3)).toNumber();
+            //console.log('weiRaisedDuringRound 3:' + weiRaisedDuringRound3 );
+            let weiRaisedDuringRound4 = (await sale.weiRaisedDuringRound.call(4)).toNumber();
+            //console.log('weiRaisedDuringRound 4:' + weiRaisedDuringRound4 );
+            
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            //console.log('totalWeiRaised:' + totalWeiRaised);
+
+            assert.equal(totalWeiRaised, web3.toWei(55000), 'total wei raised - manual computation ' );
+            assert.equal(totalWeiRaised, weiRaisedDuringRound1 + weiRaisedDuringRound2 + weiRaisedDuringRound3 + weiRaisedDuringRound4, 'total wei raised = sum of all rounds' );
+        });           
+
+        it("should have correct tokens accounted for", async () => {
+            let ownerTokenBalance = await token.balanceOf.call(owner);
+            let saleTokenBalance = await token.balanceOf.call(sale.address);
+
+            let account1TokenBalance = await token.balanceOf.call(accounts[1]);
+            let account2TokenBalance = await token.balanceOf.call(accounts[2]);
+            let account3TokenBalance = await token.balanceOf.call(accounts[3]);
+            let account4TokenBalance = await token.balanceOf.call(accounts[4]);
+
+            /*
+            console.log('ownerTokenBalance', ownerTokenBalance);
+            console.log('saleTokenBalance', saleTokenBalance);
+            console.log('account1TokenBalance', account1TokenBalance);
+            console.log('account2TokenBalance', account2TokenBalance);
+            console.log('account3TokenBalance', account3TokenBalance);
+            console.log('account4TokenBalance', account4TokenBalance);
+            */
+
+            let saleTokenBalanceExpected = saleSupplyAllocation - account1TokenBalance - account2TokenBalance - account3TokenBalance - account4TokenBalance;
+            //console.log('saleTokenBalance', saleTokenBalance);
+            //console.log('saleTokenBalanceExpected', saleTokenBalanceExpected);
+            let saleTokenBalance_estimate = Math.round(saleTokenBalance / Math.pow(10,18));
+            let saleTokenBalanceExpected_estimate = Math.round(saleTokenBalanceExpected / Math.pow(10,18));
+            //console.log('saleTokenBalance_estimate', saleTokenBalance_estimate);
+            //console.log('saleTokenBalanceExpected_estimate', saleTokenBalanceExpected_estimate);
+            assert.equal( saleTokenBalance_estimate, saleTokenBalanceExpected_estimate, 'Expected tokens post sale should match what we expected.');
         });
 
     });

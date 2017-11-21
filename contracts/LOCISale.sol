@@ -55,7 +55,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     event RefundsEnabled();
     event Refunded(address indexed buyer, uint256 weiAmount);
     event ToppedUp();
-    event PegETHUSD(uint256 pegETHUSD);
+    event PegETHUSD(uint256 pegETHUSD);    
 
     function LOCISale(
         address _token,                 /* LOCIcoin contract address */
@@ -167,7 +167,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // prevent anything more than maxContributionWei per
         // contributor address
         uint256 weiContributionAllowed = maxContributionWei.sub(contributions[msg.sender]);
-        require(weiContributionAllowed > 0);
+        if(maxContributionWei > 0) {
+            require(weiContributionAllowed > 0);
+        }
 
         // are limited by the number of tokens remaining
         uint256 tokensRemaining = token.balanceOf(address(this)).sub( reservedTokens );
@@ -179,15 +181,16 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             weiContribution = weiContributionAllowed;
 
         // limit contribution's value based on hard cap of hardCap
-        if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap )
-            weiContribution = hardCap.sub(weiRaised);
+        if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap ) {                        
+            weiContribution = hardCap - weiRaised;            
+        }
 
         // calculate token amount to be created
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
         uint256 tokens = weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
         var (the_end, the_rate, the_round) = determineDiscountTranche();
         if (the_rate > 0) {
-            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(the_rate));
+            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(uint256(the_rate));            
         }                            
 
         if (tokens > tokensRemaining) {
@@ -196,8 +199,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             if (the_rate > 0)
                 weiContribution = tokens.mul(uint256(the_rate)).div(100).div(peggedETHUSD);
             else
-                weiContribution = tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);
-        }
+                weiContribution = tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);    
+        }                    
 
         // add the contributed wei to any existing value for the sender
         contributions[msg.sender] = contributions[msg.sender].add(weiContribution);
@@ -215,8 +218,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         }
 
         uint256 _weiRefund = msg.value.sub(weiContribution);
-        if (_weiRefund > 0)
-            require(msg.sender.call.value(_weiRefund)());
+        if (_weiRefund > 0) {
+            require(msg.sender.call.value(_weiRefund)());            
+        }
     }    
 
     // in case we need to return funds to this contract
