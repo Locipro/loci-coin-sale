@@ -25,6 +25,7 @@ contract('Sale Tests', accounts => {
     let start = web3.eth.getBlock('latest').timestamp;
     let discounts = []; // no tranche discounting
     let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */
+    let hardCapETHInWei = new BigNumber(   64000 * Math.pow(10,18))
 
     contract('LOCISale inputs with specific tests', accounts => {
         let isPresale = false;
@@ -51,6 +52,7 @@ contract('Sale Tests', accounts => {
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
                 new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
@@ -395,6 +397,7 @@ contract('Sale Tests', accounts => {
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
                 new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
@@ -626,6 +629,7 @@ contract('Sale Tests', accounts => {
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
                 new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
@@ -1105,6 +1109,7 @@ contract('Sale Tests', accounts => {
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
                 new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
@@ -1261,6 +1266,7 @@ contract('Sale Tests', accounts => {
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
                 new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),
@@ -1496,6 +1502,7 @@ contract('Sale Tests', accounts => {
             sale = await Sale.new(
                 token.address,
                 new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
                 new BigNumber(reservedTokens),
                 isPresale,
                 new BigNumber(minimumGoal),

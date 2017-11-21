@@ -30,6 +30,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     uint256 internal weiForRefund;  /* only applicable if we enable refunding, if we don't meet our expected raise */  
 
     uint256 public peggedETHUSD;    /* In whole dollars. $300 means use 300 */
+    uint256 public hardCapETHinWei; /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
     uint256 public reservedTokens;  /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
     uint256 public baseRateInCents; /* $2.50 means use 250 */
 
@@ -59,6 +60,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     function LOCISale(
         address _token,                 /* LOCIcoin contract address */
         uint256 _peggedETHUSD,          /* 300 = 300 USD */
+        uint256 _hardCapETHinWei,       /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
         uint256 _reservedTokens,        /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
         bool _isPresale,                /* For LOCI this will be false. Presale offline, and accounted for in reservedTokens */
         uint256 _minFundingGoalWei,     /* If we are looking to raise a minimum amount of wei, put it here */
@@ -78,6 +80,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         token = LOCIcoin(_token);
 
         peggedETHUSD = _peggedETHUSD;
+        hardCapETHinWei = _hardCapETHinWei;
         reservedTokens = _reservedTokens;
 
         isPresale = _isPresale;
@@ -174,6 +177,10 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint256 weiContribution = msg.value;
         if (weiContribution > weiContributionAllowed)
             weiContribution = weiContributionAllowed;
+
+        // limit contribution's value based on hard cap of hardCapETHinWei
+        if(hardCapETHinWei > 0 && weiRaised.add(weiContribution) > hardCapETHinWei )
+            weiContribution = hardCapETHinWei.sub(weiRaised);
 
         // calculate token amount to be created
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);

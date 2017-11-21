@@ -7,7 +7,7 @@ const BigNumber = require('bignumber.js');
 
 module.exports = (deployer, network, accounts) => {
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
-    let peggedETHUSD, reservedTokens, baseRateInCents;     
+    let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents;     
 
     if (network === 'development') {
         peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
@@ -15,6 +15,7 @@ module.exports = (deployer, network, accounts) => {
         deployAddress = accounts[0];
         totalSupply =    new BigNumber(100000000 * Math.pow(10,18)); // 100Million
         reservedTokens = new BigNumber( 54000000 * Math.pow(10,18)); // 54Million (50M reserve + 4M presale)
+        hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
         minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
         minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
         maximumContribution = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei;
@@ -38,6 +39,7 @@ module.exports = (deployer, network, accounts) => {
         return deployer.deploy(LOCISale,
             LOCIcoin.address,
             peggedETHUSD,
+            hardCapETHinWei,
             reservedTokens,
             isPresale,
             new BigNumber(minimumGoal),
