@@ -30,7 +30,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     uint256 internal weiForRefund;  /* only applicable if we enable refunding, if we don't meet our expected raise */  
 
     uint256 public peggedETHUSD;    /* In whole dollars. $300 means use 300 */
-    uint256 public hardCapETHinWei; /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
+    uint256 public hardCap;         /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
     uint256 public reservedTokens;  /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
     uint256 public baseRateInCents; /* $2.50 means use 250 */
 
@@ -80,7 +80,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         token = LOCIcoin(_token);
 
         peggedETHUSD = _peggedETHUSD;
-        hardCapETHinWei = _hardCapETHinWei;
+        hardCap = _hardCapETHinWei;
         reservedTokens = _reservedTokens;
 
         isPresale = _isPresale;
@@ -178,9 +178,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         if (weiContribution > weiContributionAllowed)
             weiContribution = weiContributionAllowed;
 
-        // limit contribution's value based on hard cap of hardCapETHinWei
-        if(hardCapETHinWei > 0 && weiRaised.add(weiContribution) > hardCapETHinWei )
-            weiContribution = hardCapETHinWei.sub(weiRaised);
+        // limit contribution's value based on hard cap of hardCap
+        if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap )
+            weiContribution = hardCap.sub(weiRaised);
 
         // calculate token amount to be created
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
@@ -229,6 +229,10 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
     function peggedETHUSD() constant onlyOwner public returns(uint256) {
         return peggedETHUSD;
+    }
+
+    function hardCapETHInWeiValue() constant onlyOwner public returns(uint256) {
+        return hardCap;
     }
 
     function weiRaisedDuringRound(uint8 round) constant onlyOwner public returns(uint256) {

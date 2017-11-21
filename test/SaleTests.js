@@ -5,7 +5,6 @@ import {increaseTime, evm_mine, verifyEvent} from '../test/helpers/extras';
 const Token = artifacts.require("./helpers/MockToken.sol");
 const Sale = artifacts.require("./helpers/MockSale.sol");
 
-
 contract('Sale Tests', accounts => {
     const eventSigTransfer = web3.sha3('Transfer(address,address,uint256)');
     const eventSigContributionReceived = web3.sha3('ContributionReceived(address,bool,uint8,uint256,uint256)');
@@ -24,8 +23,80 @@ contract('Sale Tests', accounts => {
     // restarting testrpc
     let start = web3.eth.getBlock('latest').timestamp;
     let discounts = []; // no tranche discounting
-    let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */
-    let hardCapETHInWei = new BigNumber(   64000 * Math.pow(10,18))
+    let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */    
+    let hardCapETHInWei = new BigNumber( 64000 * Math.pow(10,18) );
+
+    contract('LOCISale hard cap ETH in wei', accounts => {
+        let isPresale = false;
+        let minimumGoal = web3.toWei(50000, 'ether');
+        let minimumContribution = 0.1 * web3.toWei(1, 'ether');
+        let maximumContribution = 50000 * web3.toWei(1, 'ether');
+
+        let totalTokenSupply =     web3.toWei(100000000, 'ether'); // 100 Million in wei
+        let reservedTokens = web3.toWei(0, 'ether');    //  4 Million in wei = (4M tokens presale)
+        let peggedETHUSD = 300; // $300 USD
+        let saleSupplyAllocation_inEther = 50000000;
+        let saleSupplyAllocation =  web3.toWei(saleSupplyAllocation_inEther, 'ether'); // 50 Million in wei        
+
+        let hours = 600; // 5 days in hours + 10 hours for 0% discount testing
+        let discounts = [
+            48, 33,  // first  48 hours, 0.33 price (2 days)
+            168, 44, // next  168 hours, 0.44 price (7 days)
+            168, 57, // next  168 hours, 0.57 price (7 days)
+            216, 75, // final 216 hours, 0.75 price (9 days)
+        ];
+
+        before(async () => {
+            token = await Token.new(totalTokenSupply, {from: deployAddress});
+            sale = await Sale.new(
+                token.address,
+                new BigNumber(peggedETHUSD),
+                hardCapETHInWei,
+                new BigNumber(reservedTokens),
+                isPresale,
+                new BigNumber(minimumGoal),
+                new BigNumber(minimumContribution),
+                new BigNumber(maximumContribution),
+                new BigNumber(start),
+                new BigNumber(hours),
+                new BigNumber(baseRateInCents),
+                discounts.map(v => new BigNumber(v)),
+                {from: deployAddress});
+            owner = await sale.owner.call();
+
+            peggedETHUSD = await sale.peggedETHUSD.call();            
+
+            await token.ownerSetOverride(sale.address, true, {from: owner});
+        });
+
+        beforeEach(async () => {
+            owner_starting_balance = await token.balanceOf.call(owner);
+            sale_starting_balance = await token.balanceOf.call(sale.address);
+            account_two_starting_balance = await token.balanceOf.call(accounts[1]);
+            account_three_starting_balance = await token.balanceOf.call(accounts[2]);
+
+            await sale.pegETHUSD(300, {from: owner});
+        });
+
+        it("should have the correct token balance after initial token transfer", async () => {
+            let txr = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            let initial_balance_value = await token.balanceOf.call(sale.address);
+            let initial_balance_value_in_ether = new BigNumber(initial_balance_value).dividedBy( Math.pow(10,18) );
+            assert.equal(initial_balance_value_in_ether, saleSupplyAllocation_inEther, "sale's token balance isn't correct");
+        });
+
+        it("should have the correct hard cap ETH settings", async () => {
+
+            let hardCapETHInWei_value = await sale.hardCapETHInWeiValue.call();
+            let hardCapETHInWei_value_in_ether = new BigNumber(hardCapETHInWei_value).dividedBy( Math.pow(10,18) );
+            //console.log('hardCapETHInWei_value', hardCapETHInWei_value);
+            //console.log('hardCapETHInWei_value_in_ether', hardCapETHInWei_value_in_ether);
+
+            assert.equal(hardCapETHInWei_value_in_ether, 64000, "hardCapETHInWei not set");           
+        });
+
+    });
 
     contract('LOCISale inputs with specific tests', accounts => {
         let isPresale = false;
