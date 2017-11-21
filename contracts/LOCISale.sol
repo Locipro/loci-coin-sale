@@ -182,7 +182,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         // limit contribution's value based on hard cap of hardCap
         if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap ) {                        
-            weiContribution = hardCap - weiRaised;            
+            weiContribution = hardCap.sub( weiRaised );            
         }
 
         // calculate token amount to be created
