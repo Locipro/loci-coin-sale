@@ -139,7 +139,7 @@ contract('Sale Tests', accounts => {
 
         it("should have the correct token balance after initial token transfer", async () => {
             let txr = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
-            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
             let initial_balance_value = await token.balanceOf.call(sale.address);
             let initial_balance_value_in_ether = new BigNumber(initial_balance_value).dividedBy( Math.pow(10,18) );
             assert.equal(initial_balance_value_in_ether, saleSupplyAllocation_inEther, "sale's token balance isn't correct");
@@ -471,7 +471,7 @@ contract('Sale Tests', accounts => {
 
         it("should have the correct token balance after initial token transfer", async () => {
             let txr = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
-            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
             assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
         });
 
@@ -505,8 +505,8 @@ contract('Sale Tests', accounts => {
                 value: web3.toWei(1, 'ether'),
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             // calculate the cost of the gas used
             let tx = web3.eth.getTransaction(hash);
@@ -703,7 +703,7 @@ contract('Sale Tests', accounts => {
 
         it("should have the correct token balance after initial token transfer", async () => {
             let txr = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
-            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
             assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
         });
 
@@ -726,8 +726,8 @@ contract('Sale Tests', accounts => {
                 value: web3.toWei(1, 'ether'),
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             // calculate the cost of the gas used
             let tx = web3.eth.getTransaction(hash);
@@ -848,8 +848,8 @@ contract('Sale Tests', accounts => {
                 value: oneTenthEtherInWei,
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             // calculate the cost of the gas used
             let tx = web3.eth.getTransaction(hash);
@@ -922,8 +922,8 @@ contract('Sale Tests', accounts => {
                 value: web3.toWei(0.4, 'ether'),
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             // calculate the cost of the gas used
             let tx = web3.eth.getTransaction(hash);
@@ -986,8 +986,8 @@ contract('Sale Tests', accounts => {
                 value: web3.toWei(0.5, 'ether'),
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
             assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
         });
 
@@ -1000,8 +1000,8 @@ contract('Sale Tests', accounts => {
                 value: web3.toWei(0.5, 'ether'),
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
             assert.equal(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should equal to minimum goal");
         });
 
@@ -1060,8 +1060,8 @@ contract('Sale Tests', accounts => {
                 value: web3.toWei(0.5, 'ether'),
                 gas: 150000
             });
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
             assert.isAbove(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should greater or equal to minimum goal");
         });
 
@@ -1146,15 +1146,15 @@ contract('Sale Tests', accounts => {
         it("should have the correct token balance after initial token transfer", async () => {
             let r = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
             assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
-            //assert(verifyEvent(r.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(r.tx, eventSigTransfer), "Transfer event wasn't emitted");
         });
 
         it("should allow a contribution", async () => {
             assert.equal(web3.eth.getBalance(sale.address), 0, "sale ether balance should be zero");
 
             let hash = web3.eth.sendTransaction({from: accounts[1], to: sale.address, value: web3.toWei(0.5, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             assert.equal(web3.eth.getBalance(sale.address).toNumber(), web3.toWei(0.5, "ether"), "no ether contributions were received");
         });
@@ -1303,23 +1303,23 @@ contract('Sale Tests', accounts => {
         it("should have the correct token balance after initial token transfer", async () => {
             let r = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
             assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
-            //assert(verifyEvent(r.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(r.tx, eventSigTransfer), "Transfer event wasn't emitted");
         });
 
         it("should allow contributions", async () => {
             assert.equal(web3.eth.getBalance(sale.address), 0, "sale ether balance should be zero");
 
             let hash = web3.eth.sendTransaction({from: accounts[1], to: sale.address, value: web3.toWei(0.5, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             hash = web3.eth.sendTransaction({from: accounts[2], to: sale.address, value: web3.toWei(0.4, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             hash = web3.eth.sendTransaction({from: accounts[3], to: sale.address, value: web3.toWei(0.5, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             assert.equal(web3.eth.getBalance(sale.address).toNumber(), web3.toWei(1.4, "ether"), "incorrect ether contributions were received");
         });
@@ -1442,8 +1442,8 @@ contract('Sale Tests', accounts => {
             let _wei = await sale.contributions.call(accounts[1]);
             let _refund = weiForRefund.mul(_wei).div(weiRaised);
             let result = await token.claimRefund(sale.address, {from: accounts[1]});
-            //assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
-            //assert(verifyEvent(result.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigTransfer), "Transfer event wasn't emitted");
             // calculate the cost of the gas used
             let tx = web3.eth.getTransaction(result.tx);
             let txr = result.receipt;
@@ -1454,8 +1454,8 @@ contract('Sale Tests', accounts => {
             _wei = await sale.contributions.call(accounts[2]);
             _refund = weiForRefund.mul(_wei).div(weiRaised);
             result = await token.claimRefund(sale.address, {from: accounts[2]});
-            //assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
-            //assert(verifyEvent(result.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigTransfer), "Transfer event wasn't emitted");
             // calculate the cost of the gas used
             tx = web3.eth.getTransaction(result.tx);
             txr = result.receipt;
@@ -1466,8 +1466,8 @@ contract('Sale Tests', accounts => {
             _wei = await sale.contributions.call(accounts[3]);
             _refund = weiForRefund.mul(_wei).div(weiRaised);
             result = await token.claimRefund(sale.address, {from: accounts[3]});
-            //assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
-            //assert(verifyEvent(result.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigTransfer), "Transfer event wasn't emitted");
             // calculate the cost of the gas used
             tx = web3.eth.getTransaction(result.tx);
             txr = result.receipt;
@@ -1539,23 +1539,23 @@ contract('Sale Tests', accounts => {
         it("should have the correct token balance after initial token transfer", async () => {
             let r = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
             assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
-            //assert(verifyEvent(r.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(r.tx, eventSigTransfer), "Transfer event wasn't emitted");
         });
 
         it("should remain below minimal goal after insufficient ether contributions", async () => {
             // do a purchase, but not enough to put us over our min raising goal
             let hash = web3.eth.sendTransaction({from: accounts[1], to: sale.address, value: web3.toWei(0.1, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
             hash = web3.eth.sendTransaction({from: accounts[2], to: sale.address, value: web3.toWei(0.1, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
             hash = web3.eth.sendTransaction({from: accounts[3], to: sale.address, value: web3.toWei(0.1, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
             hash = web3.eth.sendTransaction({from: accounts[4], to: sale.address, value: web3.toWei(0.1, "ether"), gas: 150000});
-            //assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
-            //assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
+            assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
             let b = web3.eth.getBalance(sale.address);
             assert.isAbove(b, 0, "no ether contributions were received");
@@ -1597,7 +1597,7 @@ contract('Sale Tests', accounts => {
             assert.isNotOk(await sale.isRefunding.call(), "refunding should not be enabled yet");
             let txr = await sale.ownerEnableRefunds({from: owner});
             assert.isOk(await sale.isRefunding.call(), "refunding should be enabled");
-            //assert(verifyEvent(txr.tx, eventSigRefundsEnabled), "RefundsEnabled event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigRefundsEnabled), "RefundsEnabled event wasn't emitted");
         });
 
         it("should prevent enabling refunding a second time", async () => {
@@ -1646,7 +1646,7 @@ contract('Sale Tests', accounts => {
             let txr = result.receipt;
             let cost = tx.gasPrice * txr.gasUsed;
 
-            //assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(result.tx, eventSigRefunded), "Refunded event wasn't emitted");
 
             let diff_tokens = account_two_starting_balance.minus(account2_balance_token2);
             let diff_eth = account2_balance_eth.minus(account2_balance_eth2.plus(cost));
@@ -1669,14 +1669,14 @@ contract('Sale Tests', accounts => {
 
         it("should have proper token and eth balances for participants after refunding complete", async () => {
             let txr = await token.claimRefund(sale.address, {from: accounts[2]});
-            //assert(verifyEvent(txr.tx, eventSigRefunded), "Refunded event wasn't emitted");
-            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
             txr = await token.claimRefund(sale.address, {from: accounts[3]});
-            //assert(verifyEvent(txr.tx, eventSigRefunded), "Refunded event wasn't emitted");
-            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
             txr = await token.claimRefund(sale.address, {from: accounts[4]});
-            //assert(verifyEvent(txr.tx, eventSigRefunded), "Refunded event wasn't emitted");
-            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigRefunded), "Refunded event wasn't emitted");
+            assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
 
             assert.equal(web3.eth.getBalance(sale.address), web3.toWei(1, 'ether'), "eth balance should be 1 ether due to previous topup");
             assert.equal((await token.balanceOf.call(owner)).plus(
