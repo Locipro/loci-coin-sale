@@ -109,7 +109,10 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
             tranche_round += 1;
 
-            discountTranches.push(DiscountTranche(_end, uint8(_hourBasedDiscounts[i + 1]), uint8(tranche_round), 0));
+            discountTranches.push(DiscountTranche({ end:_end, 
+                                                    discount:uint8(_hourBasedDiscounts[i + 1]), 
+                                                    round:uint8(tranche_round), 
+                                                    roundWeiRaised:0}));
 
             discountTrancheLength = uint8(i+1);
         }
