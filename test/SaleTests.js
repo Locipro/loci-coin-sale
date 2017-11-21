@@ -319,8 +319,25 @@ contract('Sale Tests', accounts => {
                 web3.eth.sendTransaction({from: accounts[3], to: sale.address, value: web3.toWei(0.2, "ether"), gas: 150000});
                 valid = false;
             } catch (error) {}
-            assert(valid, "should not be allowed to contribute after sale end");
-        });        
+            assert(valid, "should not be allowed to contribute after sale end");                        
+        });     
+
+        it("should have correct weiContributions accounted for", async () => {
+            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();
+            //console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );
+            let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
+            //console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            let weiRaisedDuringRound3 = (await sale.weiRaisedDuringRound.call(3)).toNumber();
+            //console.log('weiRaisedDuringRound 3:' + weiRaisedDuringRound3 );
+            let weiRaisedDuringRound4 = (await sale.weiRaisedDuringRound.call(4)).toNumber();
+            //console.log('weiRaisedDuringRound 4:' + weiRaisedDuringRound4 );
+            
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            //console.log('totalWeiRaised:' + totalWeiRaised);
+
+            assert.equal(totalWeiRaised, web3.toWei(63333), 'total wei raised - manual computation ' );
+            assert.equal(totalWeiRaised, weiRaisedDuringRound1 + weiRaisedDuringRound2 + weiRaisedDuringRound3 + weiRaisedDuringRound4, 'total wei raised = sum of all rounds' );
+        });           
 
     })
 
