@@ -26,6 +26,229 @@ contract('Sale Tests', accounts => {
     let discounts = []; // no tranche discounting
     let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */
 
+    contract('LOCISale inputs with specific tests', accounts => {
+        let isPresale = false;
+        let minimumGoal = web3.toWei(50000, 'ether');
+        let minimumContribution = 0.1 * web3.toWei(1, 'ether');
+        let maximumContribution = 50000 * web3.toWei(1, 'ether');
+
+        let totalTokenSupply = 100 * Math.pow(10,8) * web3.toWei(1, 'ether'); // 100 Million in wei
+        let reservedTokens = 54 * Math.pow(10,8) * web3.toWei(1, 'ether');    //  54 Million in wei = (50M + 4M presale)
+        let peggedETHUSD = 300; // $300 USD
+        let saleSupplyAllocation = 100 * Math.pow(10,8) * web3.toWei(1, 'ether'); // 100 Million in wei
+
+        let hours = 600; // 5 days in hours + 10 hours for 0% discount testing
+        let discounts = [
+            48, 33,  // first  48 hours, 0.33 price
+            168, 44, // next  168 hours, 0.44 price
+            168, 57, // next  168 hours, 0.57 price
+            216, 75, // final 216 hours, 0.75 price
+        ];
+
+        before(async () => {
+            token = await Token.new(totalTokenSupply, {from: deployAddress});
+            sale = await Sale.new(
+                token.address,
+                new BigNumber(peggedETHUSD),
+                new BigNumber(reservedTokens),
+                isPresale,
+                new BigNumber(minimumGoal),
+                new BigNumber(minimumContribution),
+                new BigNumber(maximumContribution),
+                new BigNumber(start),
+                new BigNumber(hours),
+                new BigNumber(baseRateInCents),
+                discounts.map(v => new BigNumber(v)),
+                {from: deployAddress});
+            owner = await sale.owner.call();
+
+            peggedETHUSD = await sale.peggedETHUSD.call();            
+
+            await token.ownerSetOverride(sale.address, true, {from: owner});
+        });
+
+        beforeEach(async () => {
+            owner_starting_balance = await token.balanceOf.call(owner);
+            sale_starting_balance = await token.balanceOf.call(sale.address);
+            account_two_starting_balance = await token.balanceOf.call(accounts[1]);
+            account_three_starting_balance = await token.balanceOf.call(accounts[2]);
+
+            await sale.pegETHUSD(300, {from: owner});
+        });
+
+        it("should have a peggedETHUSD", async () => {
+            assert.equal((await sale.peggedETHUSD.call()).toNumber(), 300, "default peggedETHUSD does not match");
+
+            await sale.pegETHUSD(330, {from: owner});
+
+            assert.equal((await sale.peggedETHUSD.call()).toNumber(), 330, "default peggedETHUSD does not match");
+        });
+
+        it("should have the correct initial settings", async () => {
+            assert.equal((await sale.peggedETHUSD.call()).toNumber(), 300, "default peggedETHUSD does not match");
+
+            assert.equal(token.address, await sale.getTokenAddress.call(), "token addresses do not match");
+            assert.equal(owner, accounts[0], "owner address does not match accounts[0]");
+            assert.equal(owner, await token.owner.call(), "owner addresses do not match");
+            assert.equal(await sale.isPresale.call(), isPresale, "should be presale");
+            assert.equal((await sale.minFundingGoalWei.call()).toNumber(), minimumGoal, "min goals do not match");
+            assert.equal((await sale.minContributionWei.call()).toNumber(), minimumContribution, "min goals do not match");
+            assert.equal((await sale.maxContributionWei.call()).toNumber(), maximumContribution, "max goals do not match");
+            assert.equal(sale_starting_balance, 0, "sale's token balance isn't zero");
+
+            assert.equal((await sale.getDiscountTrancheDiscount(0)), 33, 'First round discount');
+            assert.equal((await sale.getDiscountTrancheDiscount(1)), 44, 'Second round discount');
+            assert.equal((await sale.getDiscountTrancheDiscount(2)), 57, 'Third round discount');
+            assert.equal((await sale.getDiscountTrancheDiscount(3)), 75, 'Fourth round discount');
+
+            let valid = true;
+            try {
+                await sale.getDiscountTrancheDiscount(4);
+                valid = false;
+            } catch (error) {
+            }
+            assert(valid, "Fifth round does not exist");
+        });
+
+        it("should have sane discount tranche values", async () => {
+            let pointInTime = start = (await sale.start.call()).toNumber();
+            let end = (await sale.end.call()).toNumber();
+            let trancheEnd, trancheDiscount;
+            let i = 0, y = 0;
+
+            while (true) {
+                try {
+                    trancheEnd = await sale.getDiscountTrancheEnd.call(i);
+                    trancheDiscount = await sale.getDiscountTrancheDiscount.call(i);
+                    //console.log('trancheEnd:' + trancheEnd);
+                    //console.log('trancheDiscount:' + trancheDiscount);
+                } catch (error) {
+                    break;
+                }
+                pointInTime = pointInTime + discounts[y] * 3600;
+                assert.equal(trancheEnd.toNumber(), pointInTime, "tranche end time is incorrect; index " + i);
+                assert.equal(trancheDiscount.toNumber(), discounts[y + 1], "tranche rate is incorrect; index " + i);
+                assert.isAtMost(trancheEnd.toNumber(), end, "tranche end time must be less than the sale end time; index " + i);
+                ++i;
+                y += 2;
+            }
+        });
+
+        it("should have the correct token balance after initial token transfer", async () => {
+            let txr = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
+            //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
+            assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
+        });
+
+        it("should throw exception when less than minimum contribution", async () => {
+            let valid = true;
+            try {
+                web3.eth.sendTransaction({from: accounts[1], to: sale.address, value: 1, gas: 150000});
+                valid = false;
+            } catch (error) {
+            }
+            assert(valid, "contribution should not be less than minimum contribution");
+            assert.equal(web3.eth.getBalance(sale.address), 0, "contract wei balance should remain at zero");
+        });
+
+        it("should throw exception when less than minimum contribution", async () => {
+            let valid = true;
+            try {
+                web3.eth.sendTransaction({from: accounts[1], to: sale.address, value: 1, gas: 150000});
+                valid = false;
+            } catch (error) {
+            }
+            assert(valid, "contribution should not be less than minimum contribution");
+            assert.equal(web3.eth.getBalance(sale.address), 0, "contract wei balance should remain at zero");
+        });
+
+        // todo: buy 14300.000000000000000000 ETH worth of tokens, test for 13000000 tokens sold in round 1
+        it("should cap ether at max individual contribution (refund remaining ether & allocate max contribution # of tokens); verifies first tranche discount", async () => {
+            let old_balance_wei = web3.eth.getBalance(accounts[1]);
+            let hash = web3.eth.sendTransaction({
+                from: accounts[1],
+                to: sale.address,
+                value: web3.toWei(14300, 'ether'),
+                gas: 150000
+            });                        
+
+            // calculate the cost of the gas used
+            let tx = web3.eth.getTransaction(hash);
+            let txr = web3.eth.getTransactionReceipt(hash);
+            let cost = tx.gasPrice * txr.gasUsed;
+
+            let new_balance_wei = web3.eth.getBalance(accounts[1]);
+
+            // the contribution amount is: original wei balance MINUS (post-transaction wei balance PLUS gas costs)
+            //let actual_contribution_wei = old_balance_wei.minus(new_balance_wei.plus(cost));
+            //console.log(actual_contribution_wei);
+            let actual_contribution_wei = (await sale.weiRaisedDuringRound.call(1)).toNumber();
+            //console.log(actual_contribution_wei);
+            let new_balance_tokens = await token.balanceOf.call(accounts[1]);
+            let discount_rate = discounts[1];
+            //let non_discounted_expected = new BigNumber(5000 * web3.toWei(1, 'ether'));
+            let pegETHUSD = await sale.peggedETHUSD.call();
+            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD * new BigNumber(100).dividedBy(baseRateInCents));            
+            let acutal_ending_balance =  (new_balance_tokens.minus(account_two_starting_balance)).toNumber();
+            
+            /*
+            console.log('discount_rate:' + discount_rate);
+            console.log('new_balance_tokens:' + new_balance_tokens);
+            console.log('pegETHUSD:' + pegETHUSD);
+            console.log('old_balance_wei:'+ old_balance_wei);
+            console.log('new_balance_wei:'+ new_balance_wei);
+            console.log('cost:'+ cost);
+            console.log('actual_contribution_wei:'+ actual_contribution_wei);
+            console.log('new_balance_tokens:'+ new_balance_tokens);
+            console.log('account_two_starting_balance:'+ account_two_starting_balance);
+            console.log('acutal_ending_balance:' + acutal_ending_balance);
+            console.log('discount_balance_expected:' + discount_balance_expected);            
+
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            console.log('totalWeiRaised:' + totalWeiRaised);            
+            */
+            
+            console.log('new_balance_wei:'+ new_balance_tokens);
+
+            assert.equal(
+                new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ), 13000000,
+                "Should have 13000000 tokens");
+        });
+
+        it("should have non-zero balance but still less than minimum goal after first successful transaction attempt", async () => {
+            let minGoal = await sale.minFundingGoalWei.call();
+            assert.notEqual(web3.eth.getBalance(sale.address).toNumber(), 0, "contract wei balance should not be zero");
+            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
+        });       
+
+        it("should move to the second discount tranche when advancing time", async () => {
+            let _index = await sale.getCurrentDiscountTrancheIndex.call();
+            let discount = await sale.getDiscountTrancheDiscount(_index);
+            await increaseTime(172801); // two days in seconds + 1 second
+            await evm_mine(); // make sure testrpc updates `now`
+            let new_index = await sale.getCurrentDiscountTrancheIndex.call();
+            let new_discount = await sale.getDiscountTrancheDiscount(new_index);
+            assert.equal(_index + 1, new_index.toNumber(), "tranche index wasn't incremented");
+            assert.notEqual(discount, new_discount, "tranche discount is the same as previous tranche discount");
+            assert.equal(new_discount, discounts[3], "tranche discount isn't correct");
+        });
+
+        // todo: buy 16333.333333333333333333 ETH worth of tokens, test for ~ 11000000 tokens sold in round 2
+
+        // todo: advance time by discounts[2] in seconds
+
+        // todo: buy 20900.000000000000000000 ETH worth of tokens, test for ~ 11000000 tokens sold in round 3
+
+        // todo: advance time by discounts[4] in seconds
+
+        // todo: buy 12000.000000000000000000 ETH worth of tokens, test for ~  4800000 tokens sold in round 4
+
+        // todo: advance time by discounts[6] in seconds
+
+        // todo: attempt purchase after token sale end date, should fail. sale is over.
+
+    })
+
     contract('LOCISale inputs with generic tests', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
@@ -256,19 +479,28 @@ contract('Sale Tests', accounts => {
             assert.equal(new_discount, discounts[3], "tranche discount isn't correct");
         });
 
-        it("should prevent any further contribution from someone who has hit their max limit", async () => {
+        //todo test this
+        /*it("should prevent any further contribution from someone who has hit their max limit", async () => {
+            web3.eth.sendTransaction({
+                    from: accounts[1],
+                    to: sale.address,
+                    value: web3.toWei(90000, 'ether'),
+                    gas: 150000
+                });
+
             let valid = true;
             try {
                 web3.eth.sendTransaction({
                     from: accounts[1],
                     to: sale.address,
-                    value: web3.toWei(49999.9, 'ether'),
+                    value: web3.toWei(90000, 'ether'),
                     gas: 150000
                 });
                 valid = false;
             } catch (error) {}
             assert(valid, "contribution was allowed when it shouldn't have been");
         });
+        */
     })
 
     contract('Basics', accounts => {
