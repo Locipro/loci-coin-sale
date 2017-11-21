@@ -309,9 +309,18 @@ contract('Sale Tests', accounts => {
             assert.isAbove(new_balance_tokens_estimate, 4799999, "Should have just over  4799999 tokens");
         });
 
-        // todo: advance time by discounts[6] in seconds
+        it("should stop allowing contributions after the sale end date", async () => {
+            await increaseTime( 60 * 60 * 24 * 9 + 1 ); // nine days in seconds + 1
+            await evm_mine(); // make sure testrpc updates `now`
 
-        // todo: attempt purchase after token sale end date, should fail. sale is over.
+            // little extra check to make sure we can't contribute after sale end
+            let valid = true;
+            try {
+                web3.eth.sendTransaction({from: accounts[3], to: sale.address, value: web3.toWei(0.2, "ether"), gas: 150000});
+                valid = false;
+            } catch (error) {}
+            assert(valid, "should not be allowed to contribute after sale end");
+        });        
 
     })
 
@@ -545,28 +554,6 @@ contract('Sale Tests', accounts => {
             assert.equal(new_discount, discounts[3], "tranche discount isn't correct");
         });
 
-        //todo test this
-        /*it("should prevent any further contribution from someone who has hit their max limit", async () => {
-            web3.eth.sendTransaction({
-                    from: accounts[1],
-                    to: sale.address,
-                    value: web3.toWei(90000, 'ether'),
-                    gas: 150000
-                });
-
-            let valid = true;
-            try {
-                web3.eth.sendTransaction({
-                    from: accounts[1],
-                    to: sale.address,
-                    value: web3.toWei(90000, 'ether'),
-                    gas: 150000
-                });
-                valid = false;
-            } catch (error) {}
-            assert(valid, "contribution was allowed when it shouldn't have been");
-        });
-        */
     })
 
     contract('Basics', accounts => {
