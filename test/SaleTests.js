@@ -32,10 +32,11 @@ contract('Sale Tests', accounts => {
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
         let maximumContribution = 50000 * web3.toWei(1, 'ether');
 
-        let totalTokenSupply = 100 * Math.pow(10,8) * web3.toWei(1, 'ether'); // 100 Million in wei
-        let reservedTokens = 54 * Math.pow(10,8) * web3.toWei(1, 'ether');    //  54 Million in wei = (50M + 4M presale)
+        let totalTokenSupply =     web3.toWei(100000000, 'ether'); // 100 Million in wei
+        let reservedTokens = web3.toWei(0, 'ether');    //  4 Million in wei = (4M tokens presale)
         let peggedETHUSD = 300; // $300 USD
-        let saleSupplyAllocation = 100 * Math.pow(10,8) * web3.toWei(1, 'ether'); // 100 Million in wei
+        let saleSupplyAllocation_inEther = 50000000;
+        let saleSupplyAllocation =  web3.toWei(saleSupplyAllocation_inEther, 'ether'); // 50 Million in wei
 
         let hours = 600; // 5 days in hours + 10 hours for 0% discount testing
         let discounts = [
@@ -137,7 +138,9 @@ contract('Sale Tests', accounts => {
         it("should have the correct token balance after initial token transfer", async () => {
             let txr = await token.transfer(sale.address, saleSupplyAllocation, {from: owner});
             //assert(verifyEvent(txr.tx, eventSigTransfer), "Transfer event wasn't emitted");
-            assert.equal(await token.balanceOf.call(sale.address), saleSupplyAllocation, "sale's token balance isn't correct");
+            let initial_balance_value = await token.balanceOf.call(sale.address);
+            let initial_balance_value_in_ether = new BigNumber(initial_balance_value).dividedBy( Math.pow(10,18) );
+            assert.equal(initial_balance_value_in_ether, saleSupplyAllocation_inEther, "sale's token balance isn't correct");
         });
 
         it("should throw exception when less than minimum contribution", async () => {
@@ -339,6 +342,33 @@ contract('Sale Tests', accounts => {
             assert.equal(totalWeiRaised, weiRaisedDuringRound1 + weiRaisedDuringRound2 + weiRaisedDuringRound3 + weiRaisedDuringRound4, 'total wei raised = sum of all rounds' );
         });           
 
+        it("should have correct tokens accounted for", async () => {
+            let ownerTokenBalance = await token.balanceOf.call(owner);
+            let saleTokenBalance = await token.balanceOf.call(sale.address);
+
+            let account1TokenBalance = await token.balanceOf.call(accounts[1]);
+            let account2TokenBalance = await token.balanceOf.call(accounts[2]);
+            let account3TokenBalance = await token.balanceOf.call(accounts[3]);
+            let account4TokenBalance = await token.balanceOf.call(accounts[4]);
+
+            /*
+            console.log('ownerTokenBalance', ownerTokenBalance);
+            console.log('saleTokenBalance', saleTokenBalance);
+            console.log('account1TokenBalance', account1TokenBalance);
+            console.log('account2TokenBalance', account2TokenBalance);
+            console.log('account3TokenBalance', account3TokenBalance);
+            console.log('account4TokenBalance', account4TokenBalance);
+            */
+
+            let saleTokenBalanceExpected = saleSupplyAllocation - account1TokenBalance - account2TokenBalance - account3TokenBalance - account4TokenBalance;
+            //console.log('saleTokenBalance', saleTokenBalance);
+            //console.log('saleTokenBalanceExpected', saleTokenBalanceExpected);
+            let saleTokenBalance_estimate = Math.round(saleTokenBalance / Math.pow(10,18));
+            let saleTokenBalanceExpected_estimate = Math.round(saleTokenBalanceExpected / Math.pow(10,18));
+            //console.log('saleTokenBalance_estimate', saleTokenBalance_estimate);
+            //console.log('saleTokenBalanceExpected_estimate', saleTokenBalanceExpected_estimate);
+            assert.equal( saleTokenBalance_estimate, saleTokenBalanceExpected_estimate, 'Expected tokens post sale should match what we expected.');
+        });
     })
 
     contract('LOCISale inputs with generic tests', accounts => {
