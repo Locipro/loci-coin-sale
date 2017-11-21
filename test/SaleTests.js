@@ -227,8 +227,7 @@ contract('Sale Tests', accounts => {
             assert.isBelow(new_balance_tokens_estimate, 10999773, "Should have just under 10999773 tokens");
             assert.isAbove(new_balance_tokens_estimate, 10999772, "Should have just over  10999772 tokens");
         });
-
-        // todo: advance time by discounts[2] in seconds
+        
         it("should move to the third discount tranche when advancing time", async () => {
             let _index = await sale.getCurrentDiscountTrancheIndex.call();
             let discount = await sale.getDiscountTrancheDiscount(_index);
@@ -268,8 +267,20 @@ contract('Sale Tests', accounts => {
             assert.isBelow(new_balance_tokens_estimate, 11000001, "Should have just under 11000001 tokens");
             assert.isAbove(new_balance_tokens_estimate, 10999999, "Should have just over  10999999 tokens");
         });
-
-        // todo: advance time by discounts[4] in seconds
+        
+        it("should move to the fourth discount tranche when advancing time", async () => {
+            let _index = await sale.getCurrentDiscountTrancheIndex.call();
+            let discount = await sale.getDiscountTrancheDiscount(_index);
+            
+            await increaseTime( 60 * 60 * 24 * 7 + 1 ); // seven days in seconds + 1
+            await evm_mine(); // make sure testrpc updates `now`
+            let new_index = await sale.getCurrentDiscountTrancheIndex.call();
+            let new_discount = await sale.getDiscountTrancheDiscount(new_index);
+            
+            assert.equal(_index.toNumber() + 1, new_index.toNumber(), "tranche index wasn't incremented");
+            assert.notEqual(discount, new_discount, "tranche discount is the same as previous tranche discount");
+            assert.equal(new_discount, discounts[7], "tranche discount isn't correct");
+        });
 
         // todo: buy 12000.000000000000000000 ETH worth of tokens, test for ~  4800000 tokens sold in round 4
 
