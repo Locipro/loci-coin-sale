@@ -26,7 +26,7 @@ contract('Sale Tests', accounts => {
     let discounts = []; // no tranche discounting
     let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */
 
-    contract('LOCISale specific tests', accounts => {
+    contract('LOCISale inputs with generic tests', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
@@ -37,10 +37,12 @@ contract('Sale Tests', accounts => {
         let peggedETHUSD = 300; // $300 USD
         let saleSupplyAllocation = 100 * Math.pow(10,8) * web3.toWei(1, 'ether'); // 100 Million in wei
 
-        let hours = 130; // 5 days in hours + 10 hours for 0% discount testing
+        let hours = 600; // 5 days in hours + 10 hours for 0% discount testing
         let discounts = [
-            48, 33, // first 48 hours, 0.33 price
-            72, 44  // next 72 hours,  0.44 price
+            48, 33,  // first  48 hours, 0.33 price
+            168, 44, // next  168 hours, 0.44 price
+            168, 57, // next  168 hours, 0.57 price
+            216, 75, // final 216 hours, 0.75 price
         ];
 
         before(async () => {
