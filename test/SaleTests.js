@@ -39,10 +39,10 @@ contract('Sale Tests', accounts => {
 
         let hours = 600; // 5 days in hours + 10 hours for 0% discount testing
         let discounts = [
-            48, 33,  // first  48 hours, 0.33 price
-            168, 44, // next  168 hours, 0.44 price
-            168, 57, // next  168 hours, 0.57 price
-            216, 75, // final 216 hours, 0.75 price
+            48, 33,  // first  48 hours, 0.33 price (2 days)
+            168, 44, // next  168 hours, 0.44 price (7 days)
+            168, 57, // next  168 hours, 0.57 price (7 days)
+            216, 75, // final 216 hours, 0.75 price (9 days)
         ];
 
         before(async () => {
@@ -163,7 +163,7 @@ contract('Sale Tests', accounts => {
         });
 
         // todo: buy 14300.000000000000000000 ETH worth of tokens, test for 13000000 tokens sold in round 1
-        it("should cap ether at max individual contribution (refund remaining ether & allocate max contribution # of tokens); verifies first tranche discount", async () => {
+        it("should allow purchase of 14300 Ether @ 33 cents = 13,000,000 * Math.pow(10,18) tokens", async () => {
             let old_balance_wei = web3.eth.getBalance(accounts[1]);
             let hash = web3.eth.sendTransaction({
                 from: accounts[1],
@@ -179,36 +179,7 @@ contract('Sale Tests', accounts => {
 
             let new_balance_wei = web3.eth.getBalance(accounts[1]);
 
-            // the contribution amount is: original wei balance MINUS (post-transaction wei balance PLUS gas costs)
-            //let actual_contribution_wei = old_balance_wei.minus(new_balance_wei.plus(cost));
-            //console.log(actual_contribution_wei);
-            let actual_contribution_wei = (await sale.weiRaisedDuringRound.call(1)).toNumber();
-            //console.log(actual_contribution_wei);
-            let new_balance_tokens = await token.balanceOf.call(accounts[1]);
-            let discount_rate = discounts[1];
-            //let non_discounted_expected = new BigNumber(5000 * web3.toWei(1, 'ether'));
-            let pegETHUSD = await sale.peggedETHUSD.call();
-            let non_discounted_expected = new BigNumber(actual_contribution_wei * pegETHUSD * new BigNumber(100).dividedBy(baseRateInCents));            
-            let acutal_ending_balance =  (new_balance_tokens.minus(account_two_starting_balance)).toNumber();
-            
-            /*
-            console.log('discount_rate:' + discount_rate);
-            console.log('new_balance_tokens:' + new_balance_tokens);
-            console.log('pegETHUSD:' + pegETHUSD);
-            console.log('old_balance_wei:'+ old_balance_wei);
-            console.log('new_balance_wei:'+ new_balance_wei);
-            console.log('cost:'+ cost);
-            console.log('actual_contribution_wei:'+ actual_contribution_wei);
-            console.log('new_balance_tokens:'+ new_balance_tokens);
-            console.log('account_two_starting_balance:'+ account_two_starting_balance);
-            console.log('acutal_ending_balance:' + acutal_ending_balance);
-            console.log('discount_balance_expected:' + discount_balance_expected);            
-
-            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
-            console.log('totalWeiRaised:' + totalWeiRaised);            
-            */
-            
-            console.log('new_balance_wei:'+ new_balance_tokens);
+            let new_balance_tokens = await token.balanceOf.call(accounts[1]);                                                    
 
             assert.equal(
                 new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ), 13000000,
@@ -233,9 +204,44 @@ contract('Sale Tests', accounts => {
             assert.equal(new_discount, discounts[3], "tranche discount isn't correct");
         });
 
-        // todo: buy 16333.333333333333333333 ETH worth of tokens, test for ~ 11000000 tokens sold in round 2
+        // todo: buy 16333 ETH worth of tokens, test for ~ 11000000 tokens sold in round 2        
+        it("should allow purchase of 16133 Ether @ 44 cents ~ = 10999772 * Math.pow(10,18) tokens", async () => {
+            let old_balance_wei = web3.eth.getBalance(accounts[1]);
+            let hash = web3.eth.sendTransaction({
+                from: accounts[2],
+                to: sale.address,
+                value: web3.toWei(16133, 'ether'), 
+                gas: 150000
+            });                        
+
+            // calculate the cost of the gas used
+            let tx = web3.eth.getTransaction(hash);
+            let txr = web3.eth.getTransactionReceipt(hash);
+            let cost = tx.gasPrice * txr.gasUsed;
+
+            let new_balance_wei = web3.eth.getBalance(accounts[2]);
+
+            let new_balance_tokens = await token.balanceOf.call(accounts[2]);                                                    
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            
+            assert.isBelow(new_balance_tokens_estimate, 10999773, "Should have just under 10999773 tokens");
+            assert.isAbove(new_balance_tokens_estimate, 10999772, "Should have just over  10999772 tokens");
+        });
 
         // todo: advance time by discounts[2] in seconds
+        it("should move to the third discount tranche when advancing time", async () => {
+            let _index = await sale.getCurrentDiscountTrancheIndex.call();
+            let discount = await sale.getDiscountTrancheDiscount(_index);
+            
+            await increaseTime( 60 * 60 * 24 * 7 + 1 ); // seven days in seconds + 1
+            await evm_mine(); // make sure testrpc updates `now`
+            let new_index = await sale.getCurrentDiscountTrancheIndex.call();
+            let new_discount = await sale.getDiscountTrancheDiscount(new_index);
+            
+            assert.equal(_index.toNumber() + 1, new_index.toNumber(), "tranche index wasn't incremented");
+            assert.notEqual(discount, new_discount, "tranche discount is the same as previous tranche discount");
+            assert.equal(new_discount, discounts[5], "tranche discount isn't correct");
+        });
 
         // todo: buy 20900.000000000000000000 ETH worth of tokens, test for ~ 11000000 tokens sold in round 3
 
