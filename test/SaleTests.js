@@ -244,6 +244,30 @@ contract('Sale Tests', accounts => {
         });
 
         // todo: buy 20900.000000000000000000 ETH worth of tokens, test for ~ 11000000 tokens sold in round 3
+        it("should allow purchase of 20900 Ether @ 57 cents ~ = 11000000 * Math.pow(10,18) tokens", async () => {
+            let old_balance_wei = web3.eth.getBalance(accounts[1]);
+            let hash = web3.eth.sendTransaction({
+                from: accounts[3],
+                to: sale.address,
+                value: web3.toWei(20900, 'ether'), 
+                gas: 150000
+            });                        
+
+            // calculate the cost of the gas used
+            let tx = web3.eth.getTransaction(hash);
+            let txr = web3.eth.getTransactionReceipt(hash);
+            let cost = tx.gasPrice * txr.gasUsed;
+
+            let new_balance_wei = web3.eth.getBalance(accounts[3]);
+
+            let new_balance_tokens = await token.balanceOf.call(accounts[3]);                                                    
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            //console.log(new_balance_tokens);
+            //console.log(new_balance_tokens_estimate);
+            
+            assert.isBelow(new_balance_tokens_estimate, 11000001, "Should have just under 11000001 tokens");
+            assert.isAbove(new_balance_tokens_estimate, 10999999, "Should have just over  10999999 tokens");
+        });
 
         // todo: advance time by discounts[4] in seconds
 
