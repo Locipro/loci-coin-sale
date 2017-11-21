@@ -22,10 +22,12 @@ module.exports = (deployer, network, accounts) => {
         start = Math.ceil((new Date()).getTime() / 1000);
         baseRateInCents = 250; // $2.50 equals 250 cents
         isPresale = true;
-        hours = 120; // 5 days in hours
+        hours = 600; // 5 days in hours + 10 hours for 0% discount testing
         discounts = [
-            48, 33,  // first 48 hours, .33 rate
-            72, 44  // next 72 hours, .44 rate
+            48, 33,  // first  48 hours, 0.33 price (2 days)
+            168, 44, // next  168 hours, 0.44 price (7 days)
+            168, 57, // next  168 hours, 0.57 price (7 days)
+            216, 75, // final 216 hours, 0.75 price (9 days)
         ];
     }
 
