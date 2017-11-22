@@ -292,6 +292,34 @@ contract('Sale Tests', accounts => {
             assert.equal(new_discount, discounts[7], "tranche discount isn't correct");
         });
 
+        // todo: buy 12000.000000000000000000 ETH worth of tokens, test for ~  4800000 tokens sold in round 4
+        it("should allow purchase of 12000 Ether @ 75 cents ~ = 4800000 * Math.pow(10,18) tokens", async () => {
+            let old_balance_wei = web3.eth.getBalance(accounts[8]);
+            let hash = web3.eth.sendTransaction({
+                from: accounts[8],
+                to: sale.address,
+                value: web3.toWei(12000, 'ether'), 
+                gas: 1500000
+            });                        
+
+            // calculate the cost of the gas used
+            let tx = web3.eth.getTransaction(hash);
+            let txr = web3.eth.getTransactionReceipt(hash);
+            let cost = tx.gasPrice * txr.gasUsed;
+
+            let new_balance_wei = web3.eth.getBalance(accounts[8]);
+
+            let new_balance_tokens = await token.balanceOf.call(accounts[8]);                                                    
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            //console.log(new_balance_tokens);
+            //console.log(new_balance_tokens_estimate);
+            
+            assert.isBelow(new_balance_tokens_estimate, 4800001, "Should have just under 4800001 tokens");
+            assert.equal(new_balance_tokens_estimate, 4800000, "Should have just about 4800000 tokens ")
+            assert.isAbove(new_balance_tokens_estimate, 4799999, "Should have just over  4799999 tokens");
+        });
+
+
     })
 
     contract('LOCISale hard cap ETH in wei', accounts => {
