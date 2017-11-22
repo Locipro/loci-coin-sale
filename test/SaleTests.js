@@ -377,6 +377,23 @@ contract('Sale Tests', accounts => {
             assert.equal( saleTokenBalance_estimate, saleTokenBalanceExpected_estimate, 'Expected tokens post sale should match what we expected.');
         });
 
+        it("should have correct weiContributions accounted for", async () => {
+            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();
+            //console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );
+            let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
+            //console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
+            let weiRaisedDuringRound3 = (await sale.weiRaisedDuringRound.call(3)).toNumber();
+            //console.log('weiRaisedDuringRound 3:' + weiRaisedDuringRound3 );
+            let weiRaisedDuringRound4 = (await sale.weiRaisedDuringRound.call(4)).toNumber();
+            //console.log('weiRaisedDuringRound 4:' + weiRaisedDuringRound4 );
+            
+            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
+            //console.log('totalWeiRaised:' + totalWeiRaised);
+
+            assert.equal(totalWeiRaised, web3.toWei(63333), 'total wei raised - manual computation ' );
+            assert.equal(totalWeiRaised, weiRaisedDuringRound1 + weiRaisedDuringRound2 + weiRaisedDuringRound3 + weiRaisedDuringRound4, 'total wei raised = sum of all rounds' );
+        });     
+
     })
 
     contract('LOCISale hard cap ETH in wei', accounts => {
