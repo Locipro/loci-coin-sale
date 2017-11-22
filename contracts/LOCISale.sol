@@ -33,6 +33,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     uint256 public hardCap;         /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
     uint256 public reservedTokens;  /* In wei. Example: 54 million tokens, use 54000000 with 18 more zeros. then it would be 54000000 * Math.pow(10,18) */    
     uint256 public baseRateInCents; /* $2.50 means use 250 */
+    uint256 internal startingTokensAmount; // this will be set once, internally
 
     mapping (address => uint256) public contributions;
 
@@ -46,6 +47,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint8 round;
         // amount raised during tranche in wei
         uint256 roundWeiRaised;
+        // amount sold during tranche in wei
+        uint256 roundTokensSold;
     }
     DiscountTranche[] internal discountTranches;
     uint8 internal currentDiscountTrancheIndex = 0;
@@ -112,7 +115,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             discountTranches.push(DiscountTranche({ end:_end, 
                                                     discount:uint8(_hourBasedDiscounts[i + 1]), 
                                                     round:uint8(tranche_round), 
-                                                    roundWeiRaised:0}));
+                                                    roundWeiRaised:0,
+                                                    roundTokensSold:0}));
 
             discountTrancheLength = uint8(i+1);
         }
@@ -122,6 +126,8 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         var (the_end, the_rate, the_round) = determineDiscountTranche();
         return the_rate;
     }
+
+    event DebugValue(uint256 value, string text);
 
     function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
         uint256 the_end = 0;
@@ -133,17 +139,26 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             if (d.end < now) {
                 // find the next applicable tranche
                 while (++currentDiscountTrancheIndex < discountTranches.length) {
-                    d = discountTranches[currentDiscountTrancheIndex];
-
-                    // this should always true on the first iteration of the
-                    // while loop; it would have to be a ghost town of a
-                    // crowdsale to jump past a tranche level (ie. multiple
-                    // loop iterations here)
+                    d = discountTranches[currentDiscountTrancheIndex];                    
                     if (d.end > now) {
                         break;
                     }
                 }
             }
+
+            // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
+            // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
+            if( d.round > 1 && d.roundTokensSold > 0 && d.round < discountTranches.length ) {
+                
+                uint256 trancheCountExceptForOne = discountTranches.length-1;
+                uint256 tokensSoldFirstRound = discountTranches[0].roundTokensSold;
+                uint256 allowedTokensThisRound = (startingTokensAmount.sub(tokensSoldFirstRound)).div(trancheCountExceptForOne);
+                                
+                if( d.roundTokensSold > allowedTokensThisRound ) {
+                    currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1; 
+                    d = discountTranches[currentDiscountTrancheIndex];                                               
+                } 
+            } 
 
             // if the index is still valid, then we must have
             // a valid tranche, so return discount rate
@@ -167,9 +182,9 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         require(msg.value >= minContributionWei);
         require(start <= now && end >= now);
 
-        // prevent anything more than maxContributionWei per
-        // contributor address
-        uint256 weiContributionAllowed = maxContributionWei.sub(contributions[msg.sender]);
+
+        // prevent anything more than maxContributionWei per contributor address
+        uint256 weiContributionAllowed = maxContributionWei > 0 ? maxContributionWei.sub(contributions[msg.sender]) : msg.value;
         if(maxContributionWei > 0) {
             require(weiContributionAllowed > 0);
         }
@@ -177,6 +192,10 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // are limited by the number of tokens remaining
         uint256 tokensRemaining = token.balanceOf(address(this)).sub( reservedTokens );
         require(tokensRemaining > 0);
+
+        if( startingTokensAmount == 0 ) {
+            startingTokensAmount = tokensRemaining; // set this once.
+        }
 
         // limit contribution's value based on max/previous contributions
         uint256 weiContribution = msg.value;
@@ -215,6 +234,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         if( discountTrancheLength > 0 && the_round > 0 && the_round <= discountTrancheLength ) {
             discountTranches[the_round-1].roundWeiRaised = discountTranches[the_round-1].roundWeiRaised.add(weiContribution);
+            discountTranches[the_round-1].roundTokensSold = discountTranches[the_round-1].roundTokensSold.add(tokens);
         }  
         if( discountTrancheLength > 0 && the_round > discountTrancheLength ) {
             weiRaisedAfterDiscounts = weiRaisedAfterDiscounts.add(weiContribution);

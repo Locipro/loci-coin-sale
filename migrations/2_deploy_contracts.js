@@ -18,7 +18,7 @@ module.exports = (deployer, network, accounts) => {
         hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
         minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
         minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
-        maximumContribution = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei;
+        maximumContribution = new BigNumber(64000 * Math.pow(10,18)); // 64000 ETH in wei;
         start = Math.ceil((new Date()).getTime() / 1000);
         baseRateInCents = 250; // $2.50 equals 250 cents
         isPresale = true;
