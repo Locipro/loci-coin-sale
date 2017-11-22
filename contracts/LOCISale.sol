@@ -148,11 +148,16 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
             // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
             // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
+            //DebugValue(d.round,'d.round');
+            //DebugValue(d.roundTokensSold,'d.roundTokensSold');
             if( d.round > 1 && d.roundTokensSold > 0 && d.round < discountTranches.length ) {
                 
                 uint256 trancheCountExceptForOne = discountTranches.length-1;
                 uint256 tokensSoldFirstRound = discountTranches[0].roundTokensSold;
                 uint256 allowedTokensThisRound = (startingTokensAmount.sub(tokensSoldFirstRound)).div(trancheCountExceptForOne);
+                //DebugValue(trancheCountExceptForOne,'trancheCountExceptForOne');
+                //DebugValue(tokensSoldFirstRound,'tokensSoldFirstRound');
+                //DebugValue(allowedTokensThisRound,'allowedTokensThisRound');            
                                 
                 if( d.roundTokensSold > allowedTokensThisRound ) {
                     currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1; 
@@ -265,6 +270,11 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     function weiRaisedDuringRound(uint8 round) constant onlyOwner public returns(uint256) {
         require( round > 0 && round <= discountTrancheLength );
         return discountTranches[round-1].roundWeiRaised;
+    }
+
+    function tokensRaisedDuringRound(uint8 round) constant onlyOwner public returns(uint256) {
+        require( round > 0 && round <= discountTrancheLength );
+        return discountTranches[round-1].roundTokensSold;
     }
 
     function weiRaisedAfterDiscountRounds() constant onlyOwner public returns(uint256) {

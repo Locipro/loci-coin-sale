@@ -269,34 +269,15 @@ contract('Sale Tests', accounts => {
             assert.equal(_index.toNumber(), new_index.toNumber(), "tranche index was incremented but should not have been");
             assert.equal( discount, discounts[5], "tranche discount should be the same as previous tranche discount but wasn't");
             assert.equal( new_discount, discounts[5], "tranche discount isn't correct");
-        });
-/*
-        // todo: buy 20900.000000000000000000 ETH worth of tokens, test for ~ 11000000 tokens sold in round 3
-        it("should allow purchase of 20900 Ether @ 57 cents ~ = 11000000 * Math.pow(10,18) tokens", async () => {
-            let old_balance_wei = web3.eth.getBalance(accounts[1]);
-            let hash = web3.eth.sendTransaction({
-                from: accounts[3],
-                to: sale.address,
-                value: web3.toWei(20900, 'ether'), 
-                gas: 1500000
-            });                        
 
-            // calculate the cost of the gas used
-            let tx = web3.eth.getTransaction(hash);
-            let txr = web3.eth.getTransactionReceipt(hash);
-            let cost = tx.gasPrice * txr.gasUsed;
 
-            let new_balance_wei = web3.eth.getBalance(accounts[3]);
-
-            let new_balance_tokens = await token.balanceOf.call(accounts[3]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
-            //console.log(new_balance_tokens);
-            //console.log(new_balance_tokens_estimate);
+            let tokensRound3 = await sale.tokensRaisedDuringRound.call(3);                                                    
+            let tokensRound3_estimate = new BigNumber(tokensRound3).dividedBy( Math.pow(10,18) );                        
+            assert.isBelow(tokensRound3_estimate,  5500001, "Should have just under 5500001 tokens");
+            assert.isAbove(tokensRound3_estimate,  5499999, "Should have just over  5499999 tokens");
             
-            assert.isBelow(new_balance_tokens_estimate, 11000001, "Should have just under 11000001 tokens");
-            assert.isAbove(new_balance_tokens_estimate, 10999999, "Should have just over  10999999 tokens");
         });
-        
+
         it("should move to the fourth discount tranche when advancing time", async () => {
             let _index = await sale.getCurrentDiscountTrancheIndex.call();
             let discount = await sale.getDiscountTrancheDiscount(_index);
@@ -311,92 +292,6 @@ contract('Sale Tests', accounts => {
             assert.equal(new_discount, discounts[7], "tranche discount isn't correct");
         });
 
-        // todo: buy 12000.000000000000000000 ETH worth of tokens, test for ~  4800000 tokens sold in round 4
-        it("should allow purchase of 12000 Ether @ 75 cents ~ = 4800000 * Math.pow(10,18) tokens", async () => {
-            let old_balance_wei = web3.eth.getBalance(accounts[1]);
-            let hash = web3.eth.sendTransaction({
-                from: accounts[4],
-                to: sale.address,
-                value: web3.toWei(12000, 'ether'), 
-                gas: 1500000
-            });                        
-
-            // calculate the cost of the gas used
-            let tx = web3.eth.getTransaction(hash);
-            let txr = web3.eth.getTransactionReceipt(hash);
-            let cost = tx.gasPrice * txr.gasUsed;
-
-            let new_balance_wei = web3.eth.getBalance(accounts[4]);
-
-            let new_balance_tokens = await token.balanceOf.call(accounts[4]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
-            //console.log(new_balance_tokens);
-            //console.log(new_balance_tokens_estimate);
-            
-            assert.isBelow(new_balance_tokens_estimate, 4800001, "Should have just under 4800001 tokens");
-            assert.equal(new_balance_tokens_estimate, 4800000, "Should have just about 4800000 tokens ")
-            assert.isAbove(new_balance_tokens_estimate, 4799999, "Should have just over  4799999 tokens");
-        });
-
-        it("should stop allowing contributions after the sale end date", async () => {
-            await increaseTime( 60 * 60 * 24 * 9 + 1 ); // nine days in seconds + 1
-            await evm_mine(); // make sure testrpc updates `now`
-
-            // little extra check to make sure we can't contribute after sale end
-            let valid = true;
-            try {
-                web3.eth.sendTransaction({from: accounts[3], to: sale.address, value: web3.toWei(0.2, "ether"), gas: 150000});
-                valid = false;
-            } catch (error) {}
-            assert(valid, "should not be allowed to contribute after sale end");                        
-        });     
-
-        it("should have correct weiContributions accounted for", async () => {
-            let weiRaisedDuringRound1 = (await sale.weiRaisedDuringRound.call(1)).toNumber();
-            //console.log('weiRaisedDuringRound 1:' + weiRaisedDuringRound1 );
-            let weiRaisedDuringRound2 = (await sale.weiRaisedDuringRound.call(2)).toNumber();
-            //console.log('weiRaisedDuringRound 2:' + weiRaisedDuringRound2 );
-            let weiRaisedDuringRound3 = (await sale.weiRaisedDuringRound.call(3)).toNumber();
-            //console.log('weiRaisedDuringRound 3:' + weiRaisedDuringRound3 );
-            let weiRaisedDuringRound4 = (await sale.weiRaisedDuringRound.call(4)).toNumber();
-            //console.log('weiRaisedDuringRound 4:' + weiRaisedDuringRound4 );
-            
-            let totalWeiRaised = (await sale.totalWeiRaised.call()).toNumber();
-            //console.log('totalWeiRaised:' + totalWeiRaised);
-
-            assert.equal(totalWeiRaised, web3.toWei(63333), 'total wei raised - manual computation ' );
-            assert.equal(totalWeiRaised, weiRaisedDuringRound1 + weiRaisedDuringRound2 + weiRaisedDuringRound3 + weiRaisedDuringRound4, 'total wei raised = sum of all rounds' );
-        });           
-
-        it("should have correct tokens accounted for", async () => {
-            let ownerTokenBalance = await token.balanceOf.call(owner);
-            let saleTokenBalance = await token.balanceOf.call(sale.address);
-
-            let account1TokenBalance = await token.balanceOf.call(accounts[1]);
-            let account2TokenBalance = await token.balanceOf.call(accounts[2]);
-            let account3TokenBalance = await token.balanceOf.call(accounts[3]);
-            let account4TokenBalance = await token.balanceOf.call(accounts[4]);
-
-            
-            //console.log('ownerTokenBalance', ownerTokenBalance);
-            //console.log('saleTokenBalance', saleTokenBalance);
-            //console.log('account1TokenBalance', account1TokenBalance);
-            //console.log('account2TokenBalance', account2TokenBalance);
-            //console.log('account3TokenBalance', account3TokenBalance);
-            //console.log('account4TokenBalance', account4TokenBalance);
-            
-
-            let saleTokenBalanceExpected = saleSupplyAllocation - account1TokenBalance - account2TokenBalance - account3TokenBalance - account4TokenBalance;
-            //console.log('saleTokenBalance', saleTokenBalance);
-            //console.log('saleTokenBalanceExpected', saleTokenBalanceExpected);
-            let saleTokenBalance_estimate = Math.round(saleTokenBalance / Math.pow(10,18));
-            let saleTokenBalanceExpected_estimate = Math.round(saleTokenBalanceExpected / Math.pow(10,18));
-            //console.log('saleTokenBalance_estimate', saleTokenBalance_estimate);
-            //console.log('saleTokenBalanceExpected_estimate', saleTokenBalanceExpected_estimate);
-            assert.equal( saleTokenBalance_estimate, saleTokenBalanceExpected_estimate, 'Expected tokens post sale should match what we expected.');
-        });
-
-        */
     })
 
     contract('LOCISale hard cap ETH in wei', accounts => {
