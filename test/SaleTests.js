@@ -318,7 +318,64 @@ contract('Sale Tests', accounts => {
             assert.equal(new_balance_tokens_estimate, 4800000, "Should have just about 4800000 tokens ")
             assert.isAbove(new_balance_tokens_estimate, 4799999, "Should have just over  4799999 tokens");
         });
+        
+        it("should allow additional purchase of 12000 Ether @ 75 cents ~ = CAP(4180000) * Math.pow(10,18) tokens", async () => {
+            let old_balance_wei = web3.eth.getBalance(accounts[9]);
 
+            let old_balance_tokens = await token.balanceOf.call(accounts[9]);                                                    
+            let hash = web3.eth.sendTransaction({
+                from: accounts[9],
+                to: sale.address,
+                value: web3.toWei(12000, 'ether'), 
+                gas: 1500000
+            });                        
+
+            // calculate the cost of the gas used
+            let tx = web3.eth.getTransaction(hash);
+            let txr = web3.eth.getTransactionReceipt(hash);
+            let cost = tx.gasPrice * txr.gasUsed;
+
+            let new_balance_wei = web3.eth.getBalance(accounts[9]);
+
+            let new_balance_tokens = (await token.balanceOf.call(accounts[9])) - old_balance_tokens;
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            //console.log(new_balance_tokens);
+            //console.log(new_balance_tokens_estimate);
+            
+            assert.isBelow(new_balance_tokens_estimate, 4180001, "Should have just under 4180001 tokens");
+            assert.equal(new_balance_tokens_estimate, 4180000, "Should have just about 4180000 tokens ")
+            assert.isAbove(new_balance_tokens_estimate, 4179999, "Should have just over  4179999 tokens");
+        });
+
+        it("should have correct tokens accounted for", async () => {
+            let ownerTokenBalance = await token.balanceOf.call(owner);
+            let saleTokenBalance = await token.balanceOf.call(sale.address);
+
+            let account1TokenBalance = await token.balanceOf.call(accounts[5]);
+            let account2TokenBalance = await token.balanceOf.call(accounts[6]);
+            let account3TokenBalance = await token.balanceOf.call(accounts[7]);
+            let account4TokenBalance = await token.balanceOf.call(accounts[8]);
+            let account5TokenBalance = await token.balanceOf.call(accounts[9]);
+
+            
+            //console.log('ownerTokenBalance', ownerTokenBalance);
+            //console.log('saleTokenBalance', saleTokenBalance);
+            //console.log('account1TokenBalance', account1TokenBalance);
+            //console.log('account2TokenBalance', account2TokenBalance);
+            //console.log('account3TokenBalance', account3TokenBalance);
+            //console.log('account4TokenBalance', account4TokenBalance);
+            //console.log('account5TokenBalance', account5TokenBalance);
+            
+
+            let saleTokenBalanceExpected = saleSupplyAllocation - account1TokenBalance - account2TokenBalance - account3TokenBalance - account4TokenBalance - account5TokenBalance;
+            //console.log('saleTokenBalance', saleTokenBalance);
+            //console.log('saleTokenBalanceExpected', saleTokenBalanceExpected);
+            let saleTokenBalance_estimate = Math.round(saleTokenBalance / Math.pow(10,18));
+            let saleTokenBalanceExpected_estimate = Math.round(saleTokenBalanceExpected / Math.pow(10,18));
+            //console.log('saleTokenBalance_estimate', saleTokenBalance_estimate);
+            //console.log('saleTokenBalanceExpected_estimate', saleTokenBalanceExpected_estimate);
+            assert.equal( saleTokenBalance_estimate, saleTokenBalanceExpected_estimate, 'Expected tokens post sale should match what we expected.');
+        });
 
     })
 

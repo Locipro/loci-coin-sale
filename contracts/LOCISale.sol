@@ -125,9 +125,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     function determineDiscountRate() internal returns (uint8) {        
         var (the_end, the_rate, the_round) = determineDiscountTranche();
         return the_rate;
-    }
-
-    event DebugValue(uint256 value, string text);
+    }    
 
     function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
         uint256 the_end = 0;
@@ -147,17 +145,12 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             }
 
             // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
-            // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
-            //DebugValue(d.round,'d.round');
-            //DebugValue(d.roundTokensSold,'d.roundTokensSold');
+            // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches            
             if( d.round > 1 && d.roundTokensSold > 0 && d.round < discountTranches.length ) {
                 
                 uint256 trancheCountExceptForOne = discountTranches.length-1;
                 uint256 tokensSoldFirstRound = discountTranches[0].roundTokensSold;
-                uint256 allowedTokensThisRound = (startingTokensAmount.sub(tokensSoldFirstRound)).div(trancheCountExceptForOne);
-                //DebugValue(trancheCountExceptForOne,'trancheCountExceptForOne');
-                //DebugValue(tokensSoldFirstRound,'tokensSoldFirstRound');
-                //DebugValue(allowedTokensThisRound,'allowedTokensThisRound');            
+                uint256 allowedTokensThisRound = (startingTokensAmount.sub(tokensSoldFirstRound)).div(trancheCountExceptForOne);                          
                                 
                 if( d.roundTokensSold > allowedTokensThisRound ) {
                     currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1; 
@@ -208,7 +201,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
             weiContribution = weiContributionAllowed;
 
         // limit contribution's value based on hard cap of hardCap
-        if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap ) {                        
+        if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap ) {              
             weiContribution = hardCap.sub( weiRaised );            
         }
 
@@ -216,11 +209,11 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
         uint256 tokens = weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
         var (the_end, the_rate, the_round) = determineDiscountTranche();
-        if (the_rate > 0) {
-            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(the_rate);            
+        if (the_rate > 0) {            
+            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(the_rate);                        
         }                            
 
-        if (tokens > tokensRemaining) {
+        if (tokens > tokensRemaining) {            
             // there aren't enough tokens to fill the contribution amount, so recalculate the contribution amount
             tokens = tokensRemaining;
             if (the_rate > 0)
