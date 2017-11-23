@@ -95,7 +95,7 @@ solidity_flattener --solc-paths "zeppelin-solidity=<absolute path to your files>
 ```
 Use the concatenated contracts in these 'unified' .sol files to deploy in [Mist][mist]. Note that these 'unified' files are also useful when [verifying your contract on Etherscan.io][etherscan verifycontract].
 
-[LOCIcoin]: https://www.unitycoin.onewed.com/
+[LOCIcoin]: https://www.locipro.com/whitepaper
 [ethereum]: https://www.ethereum.org/
 [openzeppelin]: https://openzeppelin.org/
 [solidity]: https://solidity.readthedocs.io/
