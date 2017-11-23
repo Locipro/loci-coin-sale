@@ -16,9 +16,14 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
     bool public tokenActive = false;
 
     modifier onlyIfTokenActiveOrOverride() {
-        // msg.sender or any addresses listed in the overrides
+        // owner or any addresses listed in the overrides
         // can perform token transfers while inactive
         require(tokenActive || msg.sender == owner || allowedOverrideAddresses[msg.sender]);
+        _;
+    }
+
+    modifier onlyIfTokenInactive() {
+        require(!tokenActive);
         _;
     }
 
@@ -56,9 +61,7 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         allowedOverrideAddresses[_address] = enable;
     }
 
-    function ownerSetVisible(string _name, string _symbol) external onlyOwner {
-        // no changes once the token is active
-        require(!tokenActive);
+    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {
         // only allow it to be set once
         require(bytes(symbol).length == 0);
 
@@ -70,15 +73,14 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         symbol = _symbol;
     }
 
-    function ownerActivateToken() external onlyOwner {
-        require(!tokenActive);
+    function ownerActivateToken() external onlyOwner onlyIfTokenInactive {
         require(bytes(symbol).length > 0);
 
         tokenActive = true;
         TokenActivated();
     }
 
-    function claimRefund(address _address) external {
+    function claimRefund(IRefundHandler _refundHandler) external {
         uint256 _balance = balances[msg.sender];
 
         // Positive token balance required to perform a refund
@@ -91,10 +93,9 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         // crowdsale contract
         // Note: re-entrancy concerns are also addressed within
         // `handleRefundRequest`
-        IRefundHandler refundHandler = IRefundHandler(_address);
         // this will throw an exception if any
         // problems or if refunding isn't enabled
-        refundHandler.handleRefundRequest(msg.sender);
+        _refundHandler.handleRefundRequest(msg.sender);
 
         // If we've gotten here, then the wei transfer above
         // worked (didn't throw an exception) and it confirmed
@@ -104,6 +105,4 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         balances[owner] = balances[owner].add(_balance);
         Transfer(msg.sender, owner, _balance);
     }
-    
 }
-
