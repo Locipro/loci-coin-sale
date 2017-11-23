@@ -83,6 +83,10 @@ $ node_modules/.bin/truffle test
 ```
 **Note that there is an [outstanding testrpc issue][testrpc bug 390]** which, until fixed and released, will cause some tests to fail; it is related to the `testrpc` `evm_increaseTime` operation and its interaction with `testrpc` snapshot/revert behaviour. A [custom `testrpc` build][testrpc custom build workaround] can be made that addresses this problem in the meantime.
 
+```
+patch node_modules/ethereumjs-testrpc/build/cli.node.js testrpc-time.patch
+```
+
 ## Build
 For easy deployment via Mist, simply concatenate all contracts using [`solidity_flattener`][solidity flattener].
 ```
