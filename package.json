@@ -1,8 +1,8 @@
 {
   "name": "LOCIcoin",
   "version": "1.0.0",
-  "description": "In the interests of public disclosure, we're please to present the Unity Coin contracts.",
-  "repository": "https://github.com/locipro/LOCIcoin-sale",
+  "description": "In the interests of public disclosure, we're please to present the LOCIcoin contracts.",
+  "repository": "https://github.com/Locipro/loci-coin-sale/",
   "main": "truffle.js",
   "directories": {
     "test": "test"
