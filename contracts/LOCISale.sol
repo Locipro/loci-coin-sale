@@ -128,46 +128,48 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     }
 
     function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
+        if (currentDiscountTrancheIndex >= discountTranches.length) {
+            return(0, 0, 0);
+        }
+
+        DiscountTranche storage _dt = discountTranches[currentDiscountTrancheIndex];
+        if (_dt.end < now) {
+            // find the next applicable tranche
+            while (++currentDiscountTrancheIndex < discountTranches.length) {
+                _dt = discountTranches[currentDiscountTrancheIndex];
+                if (_dt.end > now) {
+                    break;
+                }
+            }
+        }
+
+        // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
+        // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
+        if (_dt.round > 1 && _dt.roundTokensSold > 0 && _dt.round < discountTranches.length) {
+            uint256 _trancheCountExceptForOne = discountTranches.length-1;
+            uint256 _tokensSoldFirstRound = discountTranches[0].roundTokensSold;
+            uint256 _allowedTokensThisRound = (startingTokensAmount.sub(_tokensSoldFirstRound)).div(_trancheCountExceptForOne);
+
+            if (_dt.roundTokensSold > _allowedTokensThisRound) {
+                currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1;
+                _dt = discountTranches[currentDiscountTrancheIndex];
+            }
+        }
+
         uint256 _end = 0;
         uint8 _rate = 0;
         uint8 _round = 0;
 
+        // if the index is still valid, then we must have
+        // a valid tranche, so return discount rate
         if (currentDiscountTrancheIndex < discountTranches.length) {
-            DiscountTranche storage _dt = discountTranches[currentDiscountTrancheIndex];
-            if (_dt.end < now) {
-                // find the next applicable tranche
-                while (++currentDiscountTrancheIndex < discountTranches.length) {
-                    _dt = discountTranches[currentDiscountTrancheIndex];
-                    if (_dt.end > now) {
-                        break;
-                    }
-                }
-            }
-
-            // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
-            // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
-            if (_dt.round > 1 && _dt.roundTokensSold > 0 && _dt.round < discountTranches.length) {
-                uint256 _trancheCountExceptForOne = discountTranches.length-1;
-                uint256 _tokensSoldFirstRound = discountTranches[0].roundTokensSold;
-                uint256 _allowedTokensThisRound = (startingTokensAmount.sub(_tokensSoldFirstRound)).div(_trancheCountExceptForOne);
-
-                if (_dt.roundTokensSold > _allowedTokensThisRound) {
-                    currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1;
-                    _dt = discountTranches[currentDiscountTrancheIndex];
-                }
-            }
-
-            // if the index is still valid, then we must have
-            // a valid tranche, so return discount rate
-            if (currentDiscountTrancheIndex < discountTranches.length) {
-                _end = _dt.end;
-                _rate = _dt.discount;
-                _round = _dt.round;
-            } else {
-                _end = end;
-                _rate = 0;
-                _round = discountTrancheLength + 1;
-            }
+            _end = _dt.end;
+            _rate = _dt.discount;
+            _round = _dt.round;
+        } else {
+            _end = end;
+            _rate = 0;
+            _round = discountTrancheLength + 1;
         }
 
         return (_end, _rate, _round);
