@@ -133,12 +133,12 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         uint8 _round = 0;
 
         if (currentDiscountTrancheIndex < discountTranches.length) {
-            DiscountTranche storage d = discountTranches[currentDiscountTrancheIndex];
-            if (d.end < now) {
+            DiscountTranche storage _dt = discountTranches[currentDiscountTrancheIndex];
+            if (_dt.end < now) {
                 // find the next applicable tranche
                 while (++currentDiscountTrancheIndex < discountTranches.length) {
-                    d = discountTranches[currentDiscountTrancheIndex];
-                    if (d.end > now) {
+                    _dt = discountTranches[currentDiscountTrancheIndex];
+                    if (_dt.end > now) {
                         break;
                     }
                 }
@@ -146,23 +146,23 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
             // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
             // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
-            if (d.round > 1 && d.roundTokensSold > 0 && d.round < discountTranches.length ) {
+            if (_dt.round > 1 && _dt.roundTokensSold > 0 && _dt.round < discountTranches.length) {
                 uint256 _trancheCountExceptForOne = discountTranches.length-1;
                 uint256 _tokensSoldFirstRound = discountTranches[0].roundTokensSold;
                 uint256 _allowedTokensThisRound = (startingTokensAmount.sub(_tokensSoldFirstRound)).div(_trancheCountExceptForOne);
 
-                if( d.roundTokensSold > _allowedTokensThisRound ) {
+                if (_dt.roundTokensSold > _allowedTokensThisRound) {
                     currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1;
-                    d = discountTranches[currentDiscountTrancheIndex];
+                    _dt = discountTranches[currentDiscountTrancheIndex];
                 }
             }
 
             // if the index is still valid, then we must have
             // a valid tranche, so return discount rate
             if (currentDiscountTrancheIndex < discountTranches.length) {
-                _end = d.end;
-                _rate = d.discount;
-                _round = d.round;
+                _end = _dt.end;
+                _rate = _dt.discount;
+                _round = _dt.round;
             } else {
                 _end = end;
                 _rate = 0;
