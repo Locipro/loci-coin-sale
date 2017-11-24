@@ -146,13 +146,12 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
             // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
             // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
-            if( d.round > 1 && d.roundTokensSold > 0 && d.round < discountTranches.length ) {
+            if (d.round > 1 && d.roundTokensSold > 0 && d.round < discountTranches.length ) {
+                uint256 _trancheCountExceptForOne = discountTranches.length-1;
+                uint256 _tokensSoldFirstRound = discountTranches[0].roundTokensSold;
+                uint256 _allowedTokensThisRound = (startingTokensAmount.sub(_tokensSoldFirstRound)).div(_trancheCountExceptForOne);
 
-                uint256 trancheCountExceptForOne = discountTranches.length-1;
-                uint256 tokensSoldFirstRound = discountTranches[0].roundTokensSold;
-                uint256 allowedTokensThisRound = (startingTokensAmount.sub(tokensSoldFirstRound)).div(trancheCountExceptForOne);
-
-                if( d.roundTokensSold > allowedTokensThisRound ) {
+                if( d.roundTokensSold > _allowedTokensThisRound ) {
                     currentDiscountTrancheIndex = currentDiscountTrancheIndex + 1;
                     d = discountTranches[currentDiscountTrancheIndex];
                 }
@@ -174,71 +173,71 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         return (_end, _rate, _round);
     }
 
-    function () public payable whenNotPaused {
+    function() public payable whenNotPaused {
         require(!isRefunding);
         require(msg.sender != 0x0);
         require(msg.value >= minContributionWei);
         require(start <= now && end >= now);
 
-
         // prevent anything more than maxContributionWei per contributor address
-        uint256 weiContributionAllowed = maxContributionWei > 0 ? maxContributionWei.sub(contributions[msg.sender]) : msg.value;
-        if(maxContributionWei > 0) {
-            require(weiContributionAllowed > 0);
+        uint256 _weiContributionAllowed = maxContributionWei > 0 ? maxContributionWei.sub(contributions[msg.sender]) : msg.value;
+        if (maxContributionWei > 0) {
+            require(_weiContributionAllowed > 0);
         }
 
         // are limited by the number of tokens remaining
-        uint256 tokensRemaining = token.balanceOf(address(this)).sub( reservedTokens );
-        require(tokensRemaining > 0);
+        uint256 _tokensRemaining = token.balanceOf(address(this)).sub( reservedTokens );
+        require(_tokensRemaining > 0);
 
-        if( startingTokensAmount == 0 ) {
-            startingTokensAmount = tokensRemaining; // set this once.
+        if (startingTokensAmount == 0) {
+            startingTokensAmount = _tokensRemaining; // set this once.
         }
 
         // limit contribution's value based on max/previous contributions
-        uint256 weiContribution = msg.value;
-        if (weiContribution > weiContributionAllowed)
-            weiContribution = weiContributionAllowed;
+        uint256 _weiContribution = msg.value;
+        if (_weiContribution > _weiContributionAllowed) {
+            _weiContribution = _weiContributionAllowed;
+        }
 
         // limit contribution's value based on hard cap of hardCap
-        if(hardCap > 0 && weiRaised.add(weiContribution) > hardCap ) {
-            weiContribution = hardCap.sub( weiRaised );
+        if (hardCap > 0 && weiRaised.add(_weiContribution) > hardCap) {
+            _weiContribution = hardCap.sub( weiRaised );
         }
 
         // calculate token amount to be created
-        //uint256 tokens = weiContribution.mul(tokenToWeiMultiplier);
-        uint256 tokens = weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
+        uint256 _tokens = _weiContribution.mul(peggedETHUSD).mul(100).div(baseRateInCents);
         var (, _rate, _round) = determineDiscountTranche();
         if (_rate > 0) {
-            tokens = weiContribution.mul(peggedETHUSD).mul(100).div(_rate);
+            _tokens = _weiContribution.mul(peggedETHUSD).mul(100).div(_rate);
         }
 
-        if (tokens > tokensRemaining) {
+        if (_tokens > _tokensRemaining) {
             // there aren't enough tokens to fill the contribution amount, so recalculate the contribution amount
-            tokens = tokensRemaining;
-            if (_rate > 0)
-                weiContribution = tokens.mul(_rate).div(100).div(peggedETHUSD);
-            else
-                weiContribution = tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);
+            _tokens = _tokensRemaining;
+            if (_rate > 0) {
+                _weiContribution = _tokens.mul(_rate).div(100).div(peggedETHUSD);
+            } else {
+                _weiContribution = _tokens.mul(baseRateInCents).div(100).div(peggedETHUSD);
+            }
         }
 
         // add the contributed wei to any existing value for the sender
-        contributions[msg.sender] = contributions[msg.sender].add(weiContribution);
-        ContributionReceived(msg.sender, isPresale, _rate, weiContribution, tokens);
+        contributions[msg.sender] = contributions[msg.sender].add(_weiContribution);
+        ContributionReceived(msg.sender, isPresale, _rate, _weiContribution, _tokens);
 
-        require(token.transfer(msg.sender, tokens));
+        require(token.transfer(msg.sender, _tokens));
 
-        weiRaised = weiRaised.add(weiContribution); //total of all weiContributions
+        weiRaised = weiRaised.add(_weiContribution); //total of all weiContributions
 
-        if( discountTrancheLength > 0 && _round > 0 && _round <= discountTrancheLength ) {
-            discountTranches[_round-1].roundWeiRaised = discountTranches[_round-1].roundWeiRaised.add(weiContribution);
-            discountTranches[_round-1].roundTokensSold = discountTranches[_round-1].roundTokensSold.add(tokens);
+        if (discountTrancheLength > 0 && _round > 0 && _round <= discountTrancheLength) {
+            discountTranches[_round-1].roundWeiRaised = discountTranches[_round-1].roundWeiRaised.add(_weiContribution);
+            discountTranches[_round-1].roundTokensSold = discountTranches[_round-1].roundTokensSold.add(_tokens);
         }
-        if( discountTrancheLength > 0 && _round > discountTrancheLength ) {
-            weiRaisedAfterDiscounts = weiRaisedAfterDiscounts.add(weiContribution);
+        if (discountTrancheLength > 0 && _round > discountTrancheLength) {
+            weiRaisedAfterDiscounts = weiRaisedAfterDiscounts.add(_weiContribution);
         }
 
-        uint256 _weiRefund = msg.value.sub(weiContribution);
+        uint256 _weiRefund = msg.value.sub(_weiContribution);
         if (_weiRefund > 0) {
             require(msg.sender.call.value(_weiRefund)()); //Audit: why not use msg.sender.transfer(_weiRefund) ?
         }
@@ -307,9 +306,10 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         require(_beneficiary != address(token));
         require(now > end);
 
-        uint256 tokensRemaining = token.balanceOf(address(this));
-        if (tokensRemaining > 0)
-            token.transfer(_beneficiary, tokensRemaining);
+        uint256 _tokensRemaining = token.balanceOf(address(this));
+        if (_tokensRemaining > 0) {
+            token.transfer(_beneficiary, _tokensRemaining);
+        }
     }
 
     function handleRefundRequest(address _contributor) external {
