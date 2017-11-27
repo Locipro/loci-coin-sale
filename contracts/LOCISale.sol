@@ -236,7 +236,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         uint256 _weiRefund = msg.value.sub(_weiContribution);
         if (_weiRefund > 0) {
-            require(msg.sender.call.value(_weiRefund)());
+            msg.sender.transfer(_weiRefund);
         }
     }
 
@@ -294,7 +294,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // if zero requested, send the entire amount, otherwise the amount requested
         uint256 _amount = _value > 0 ? _value : this.balance;
 
-        require(_beneficiary.call.value(_amount)());
+        _beneficiary.transfer(_amount);
     }
 
     function ownerRecoverTokens(address _beneficiary) external onlyOwner {
@@ -339,7 +339,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         contributions[_contributor] = 0;
 
         // give them their ether back; throws on failure
-        require(_contributor.call.value(_wei)());
+        _contributor.transfer(_wei);
 
         Refunded(_contributor, _wei);
     }
