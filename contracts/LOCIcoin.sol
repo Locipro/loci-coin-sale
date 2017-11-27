@@ -61,9 +61,7 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
         allowedOverrideAddresses[_address] = enable;
     }
 
-    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {
-        // only allow it to be set once
-        require(bytes(symbol).length == 0);
+    function ownerSetVisible(string _name, string _symbol) external onlyOwner onlyIfTokenInactive {        
 
         // By holding back on setting these, it prevents the token
         // from being a duplicate in ERC token searches if the need to
