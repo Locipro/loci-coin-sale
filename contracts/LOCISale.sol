@@ -122,11 +122,6 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         }
     }
 
-    function determineDiscountRate() internal returns (uint8) {
-        var (, _rate,) = determineDiscountTranche();
-        return _rate;
-    }
-
     function determineDiscountTranche() internal returns (uint256, uint8, uint8) {
         if (currentDiscountTrancheIndex >= discountTranches.length) {
             return(0, 0, 0);
