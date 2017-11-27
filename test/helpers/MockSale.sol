@@ -1,9 +1,9 @@
-pragma solidity ^0.4.18;
+pragma solidity >=0.4.18;
 
-import '../../contracts/LOCISale.sol';
+import '../../contracts/LOCIsale.sol';
 
 
-contract MockSale is LOCISale {
+contract MockSale is LOCIsale {
     function MockSale(
         address _token,                 /* LOCIcoin contract address */
         uint256 _peggedETHUSD,          /* 300 = 300 USD */
@@ -17,7 +17,7 @@ contract MockSale is LOCISale {
         uint256 _durationHours,         /* Total length of the sale, in hours */
         uint256 _baseRateInCents,       /* Base rate in cents. $2.50 would be 250 */
         uint256[] _hourBasedDiscounts   /* Single dimensional array of pairs [hours, rateInCents, hours, rateInCents, hours, rateInCents, ... ] */
-    ) LOCISale(_token, _peggedETHUSD, _hardCapETHinWei, _reservedTokens, _isPresale, _minFundingGoalWei,
+    ) LOCIsale(_token, _peggedETHUSD, _hardCapETHinWei, _reservedTokens, _isPresale, _minFundingGoalWei,
         _minContributionWei, _maxContributionWei, _start, _durationHours, _baseRateInCents, _hourBasedDiscounts) {}
 
     function getTokenAddress() external constant returns (address) {

@@ -1,7 +1,7 @@
 Using network 'development'.
 
 Compiling ./contracts/IRefundHandler.sol...
-Compiling ./contracts/LOCISale.sol...
+Compiling ./contracts/LOCIsale.sol...
 Compiling ./contracts/LOCIcoin.sol...
 Compiling ./test/helpers/MockSale.sol...
 Compiling ./test/helpers/MockToken.sol...
@@ -35,13 +35,13 @@ Spanning multiple lines.
 ,/Users/demmons/sandbox/locicoin/test/helpers/MockToken.sol:7:5: Warning: No visibility specified. Defaulting to "public".
     function MockToken(uint256 _totalSupply) LOCIcoin(_totalSupply){}
     ^---------------------------------------------------------------^
-,/Users/demmons/sandbox/locicoin/contracts/LOCISale.sol:126:14: Warning: Unused local variable.
+,/Users/demmons/sandbox/locicoin/contracts/LOCIsale.sol:126:14: Warning: Unused local variable.
         var (the_end, the_rate, the_round) = determineDiscountTranche();
              ^-----^
-,/Users/demmons/sandbox/locicoin/contracts/LOCISale.sol:126:33: Warning: Unused local variable.
+,/Users/demmons/sandbox/locicoin/contracts/LOCIsale.sol:126:33: Warning: Unused local variable.
         var (the_end, the_rate, the_round) = determineDiscountTranche();
                                 ^-------^
-,/Users/demmons/sandbox/locicoin/contracts/LOCISale.sol:211:14: Warning: Unused local variable.
+,/Users/demmons/sandbox/locicoin/contracts/LOCIsale.sol:211:14: Warning: Unused local variable.
         var (the_end, the_rate, the_round) = determineDiscountTranche();
              ^-----^
 ,/Users/demmons/sandbox/locicoin/test/helpers/MockSale.sol:30:9: Warning: Function declared as view, but this expression (potentially) modifies the state and thus requires non-payable (the default) or payable.
@@ -73,7 +73,7 @@ Spanning multiple lines.
 
 [0m[0m
 [0m  Contract: Sale Tests[0m
-[0m    Contract: LOCISale tranche roundTokensSold cap moves us to the next trancheDiscount[0m
+[0m    Contract: LOCIsale tranche roundTokensSold cap moves us to the next trancheDiscount[0m
     [32m  ✓[0m[90m should have a peggedETHUSD[0m[31m (112ms)[0m
     [32m  ✓[0m[90m should have the correct initial settings[0m[31m (343ms)[0m
     [32m  ✓[0m[90m should have sane discount tranche values[0m[31m (427ms)[0m
@@ -91,13 +91,13 @@ Spanning multiple lines.
     [32m  ✓[0m[90m should allow additional purchase of 12000 Ether @ 75 cents ~ = CAP(4180000) * Math.pow(10,18) tokens[0m[31m (931ms)[0m
     [32m  ✓[0m[90m should have correct tokens accounted for[0m[31m (179ms)[0m
     [32m  ✓[0m[90m should have correct weiContributions accounted for[0m[31m (120ms)[0m
-[0m    Contract: LOCISale hard cap ETH in wei[0m
+[0m    Contract: LOCIsale hard cap ETH in wei[0m
     [32m  ✓[0m[90m should have the correct token balance after initial token transfer[0m[31m (235ms)[0m
     [32m  ✓[0m[90m should have the correct hard cap ETH settings[0m
     [32m  ✓[0m[90m should allow purchase up to the max tokens available & without going over hardCap[0m[31m (887ms)[0m
     [32m  ✓[0m[90m should have correct weiContributions accounted for[0m[31m (119ms)[0m
     [32m  ✓[0m[90m should have correct tokens accounted for[0m[31m (142ms)[0m
-[0m    Contract: LOCISale inputs with specific tests[0m
+[0m    Contract: LOCIsale inputs with specific tests[0m
     [32m  ✓[0m[90m should have a peggedETHUSD[0m[31m (91ms)[0m
     [32m  ✓[0m[90m should have the correct initial settings[0m[31m (352ms)[0m
     [32m  ✓[0m[90m should have sane discount tranche values[0m[31m (429ms)[0m
@@ -115,7 +115,7 @@ Spanning multiple lines.
     [32m  ✓[0m[90m should stop allowing contributions after the sale end date[0m[31m (264ms)[0m
     [32m  ✓[0m[90m should have correct weiContributions accounted for[0m[31m (143ms)[0m
     [32m  ✓[0m[90m should have correct tokens accounted for[0m[31m (153ms)[0m
-[0m    Contract: LOCISale inputs with generic tests[0m
+[0m    Contract: LOCIsale inputs with generic tests[0m
     [32m  ✓[0m[90m should have a peggedETHUSD[0m[31m (92ms)[0m
     [32m  ✓[0m[90m should have the correct initial settings[0m[31m (142ms)[0m
     [32m  ✓[0m[90m should have sane discount tranche values[0m[31m (411ms)[0m

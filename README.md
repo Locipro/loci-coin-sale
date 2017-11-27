@@ -40,10 +40,10 @@ Website https://locipro.com/
 Please see the [contracts/](contracts) directory.
 
 ## Bounty Program
-~We want your input! If you're interested, please see the [LOCIcoin bounty program][bounty program] for participation details and instructions.~
+We want your input! If you're interested, please see the [LOCIcoin bounty program][bounty program] for participation details and instructions.
 
 ## Overview
-There are two primary contracts: `LOCIcoin.sol` (ERC-20 compliant token) and `LOCISale.sol` (the crowdsale contract). Additionally, there is a simple shared interface defined in `IRefundHandler.sol` that allows `LOCIcoin` and `LOCISale` to communicate refund requests and exchange wei contributions for received tokens. This refund mechanism will be triggered in the event that our sale goals are not met.
+There are two primary contracts: `LOCIcoin.sol` (ERC-20 compliant token) and `LOCIsale.sol` (the crowdsale contract). Additionally, there is a simple shared interface defined in `IRefundHandler.sol` that allows `LOCIcoin` and `LOCIsale` to communicate refund requests and exchange wei contributions for received tokens. This refund mechanism will be triggered in the event that our sale goals are not met.
 
 ### LOCIcoin
 Deriving from OpenZeppelin's ERC-20 compliant base contracts, `LOCIcoin` has the same core functionality the Ethereum ecosystem has come to expect, with minor modifications:
@@ -52,8 +52,8 @@ Deriving from OpenZeppelin's ERC-20 compliant base contracts, `LOCIcoin` has the
 1. To ensure that contributors receive their tokens during the sale, the ability to `ownerSetOverride()` addresses has been added (allows override addresses to use `transfer()`)
 1. In the event that refunds are enabled in the sale contract, token holders can exchange their tokens for ether by calling the `claimRefund()` method
 
-### LOCISale
-While not directly deriving from existing crowdsale contracts, `LOCISale` is based on the simplest combination of [OpenZeppelin code][openzeppelin], other successful crowdsale contracts, [best practices][best practices], as well as [security considerations][security concerns]. `LOCISale` functionality includes:
+### LOCIsale
+While not directly deriving from existing crowdsale contracts, `LOCIsale` is based on the simplest combination of [OpenZeppelin code][openzeppelin], other successful crowdsale contracts, [best practices][best practices], as well as [security considerations][security concerns]. `LOCIsale` functionality includes:
 1. Flexible deployment options allows multiple sale scenarios (presale + primary ICO)
 1. Time-based tranche discounting
 1. Minimum ether goal restriction (optional)
@@ -91,7 +91,7 @@ patch node_modules/ethereumjs-testrpc/build/cli.node.js testrpc-time.patch
 For easy deployment via Mist, simply concatenate all contracts using [`solidity_flattener`][solidity flattener].
 ```
 solidity_flattener --solc-paths "zeppelin-solidity=<absolute path to your files>/node_modules/zeppelin-solidity" contracts/LOCIcoin.sol > UnifiedLOCIcoin.sol
-solidity_flattener --solc-paths "zeppelin-solidity=<absolute path to your files>/node_modules/zeppelin-solidity" contracts/LOCISale.sol > UnifiedLOCISale.sol
+solidity_flattener --solc-paths "zeppelin-solidity=<absolute path to your files>/node_modules/zeppelin-solidity" contracts/LOCIsale.sol > UnifiedLOCIsale.sol
 ```
 Use the concatenated contracts in these 'unified' .sol files to deploy in [Mist][mist]. Note that these 'unified' files are also useful when [verifying your contract on Etherscan.io][etherscan verifycontract].
 

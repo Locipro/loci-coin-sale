@@ -1,7 +1,7 @@
 const SafeMath = artifacts.require('zeppelin-solidity/contracts/math/SafeMath.sol');
 const Ownable = artifacts.require('zeppelin-solidity/contracts/math/Ownable.sol');
 const LOCIcoin = artifacts.require("./LOCIcoin.sol");
-const LOCISale = artifacts.require("./LOCISale.sol");
+const LOCIsale = artifacts.require("./LOCIsale.sol");
 
 const BigNumber = require('bignumber.js');
 
@@ -34,11 +34,11 @@ module.exports = (deployer, network, accounts) => {
     deployer.deploy(SafeMath, {from: deployAddress});
     deployer.deploy(Ownable, {from: deployAddress});
 
-    deployer.link(Ownable, [LOCIcoin, LOCISale], {from: deployAddress});
-    deployer.link(SafeMath, [LOCIcoin, LOCISale], {from: deployAddress});
+    deployer.link(Ownable, [LOCIcoin, LOCIsale], {from: deployAddress});
+    deployer.link(SafeMath, [LOCIcoin, LOCIsale], {from: deployAddress});
 
     deployer.deploy(LOCIcoin, totalSupply, {from: deployAddress}).then(() => {
-        return deployer.deploy(LOCISale,
+        return deployer.deploy(LOCIsale,
             LOCIcoin.address,
             peggedETHUSD,
             hardCapETHinWei,

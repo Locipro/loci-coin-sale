@@ -26,7 +26,7 @@ contract('Sale Tests', accounts => {
     let baseRateInCents = 250; /* Base rate in cents. $2.50 would be 250 */    
     let hardCapETHInWei = new BigNumber( 63333 * Math.pow(10,18) );
     
-    contract('LOCISale tranche roundTokensSold cap moves us to the next trancheDiscount', accounts => {
+    contract('LOCIsale tranche roundTokensSold cap moves us to the next trancheDiscount', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
@@ -396,7 +396,7 @@ contract('Sale Tests', accounts => {
 
     })
 
-    contract('LOCISale hard cap ETH in wei', accounts => {
+    contract('LOCIsale hard cap ETH in wei', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
@@ -537,7 +537,7 @@ contract('Sale Tests', accounts => {
     });
 
 
-    contract('LOCISale inputs with specific tests', accounts => {
+    contract('LOCIsale inputs with specific tests', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
@@ -883,7 +883,7 @@ contract('Sale Tests', accounts => {
         });
     })
 
-    contract('LOCISale inputs with generic tests', accounts => {
+    contract('LOCIsale inputs with generic tests', accounts => {
         let isPresale = false;
         let minimumGoal = web3.toWei(50000, 'ether');
         let minimumContribution = 0.1 * web3.toWei(1, 'ether');
