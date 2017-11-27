@@ -241,19 +241,18 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
 
         uint256 _weiRefund = msg.value.sub(_weiContribution);
         if (_weiRefund > 0) {
-            require(msg.sender.call.value(_weiRefund)()); //Audit: why not use msg.sender.transfer(_weiRefund) ?
+            require(msg.sender.call.value(_weiRefund)());
         }
     }
 
     // in case we need to return funds to this contract
-    function ownerTopUp() external payable {} //Audit: this has owner prefix, but is callable by anyone
+    function ownerTopUp() external payable {}
 
     function pegETHUSD(uint256 _peggedETHUSD) onlyOwner public {
         peggedETHUSD = _peggedETHUSD;
         PegETHUSD(peggedETHUSD);
     }
 
-    //Audit: Why restrict these calls to onlyOwner?
     function peggedETHUSD() constant onlyOwner public returns(uint256) {
         return peggedETHUSD;
     }
@@ -300,7 +299,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // if zero requested, send the entire amount, otherwise the amount requested
         uint256 _amount = _value > 0 ? _value : this.balance;
 
-        require(_beneficiary.call.value(_amount)()); //Audit: why not use _beneficiary.transfer(_amount) ?
+        require(_beneficiary.call.value(_amount)());
     }
 
     function ownerRecoverTokens(address _beneficiary) external onlyOwner {
@@ -334,7 +333,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         // prorata the amount if necessary
         if (weiRaised > weiForRefund) {
             uint256 _n  = weiForRefund.mul(_wei).div(weiRaised);
-            require(_n < _wei); //Audit: Why would you stop exection here? Shouldn't this be a conditional?
+            require(_n < _wei);
             _wei = _n;
         }
 
@@ -345,7 +344,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
         contributions[_contributor] = 0;
 
         // give them their ether back; throws on failure
-        require(_contributor.call.value(_wei)()); //Audit: Why not _contributor.transfer(_wei) ?
+        require(_contributor.call.value(_wei)());
 
         Refunded(_contributor, _wei);
     }
