@@ -1,4 +1,4 @@
-pragma solidity >=0.4.18;
+pragma solidity ^0.4.18;
 
 import 'zeppelin-solidity/contracts/math/SafeMath.sol';
 import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
@@ -7,7 +7,7 @@ import './LOCIcoin.sol';
 import './IRefundHandler.sol';
 
 
-contract LOCIsale is Ownable, Pausable, IRefundHandler {
+contract LOCISale is Ownable, Pausable, IRefundHandler {
     using SafeMath for uint256;
 
     // this sale contract is creating the LOCIcoin
@@ -60,7 +60,7 @@ contract LOCIsale is Ownable, Pausable, IRefundHandler {
     event ToppedUp();
     event PegETHUSD(uint256 pegETHUSD);
 
-    function LOCIsale(
+    function LOCISale(
         address _token,                /* LOCIcoin contract address */
         uint256 _peggedETHUSD,          /* 300 = 300 USD */
         uint256 _hardCapETHinWei,       /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
