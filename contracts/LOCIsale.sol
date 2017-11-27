@@ -7,7 +7,7 @@ import './LOCIcoin.sol';
 import './IRefundHandler.sol';
 
 
-contract LOCISale is Ownable, Pausable, IRefundHandler {
+contract LOCIsale is Ownable, Pausable, IRefundHandler {
     using SafeMath for uint256;
 
     // this sale contract is creating the LOCIcoin
@@ -60,7 +60,7 @@ contract LOCISale is Ownable, Pausable, IRefundHandler {
     event ToppedUp();
     event PegETHUSD(uint256 pegETHUSD);
 
-    function LOCISale(
+    function LOCIsale(
         address _token,                /* LOCIcoin contract address */
         uint256 _peggedETHUSD,          /* 300 = 300 USD */
         uint256 _hardCapETHinWei,       /* In wei. Example: 64,000 cap = 64,000,000,000,000,000,000,000 */
