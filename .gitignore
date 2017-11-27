@@ -8,3 +8,4 @@
 /scTopics
 .idea
 .node-xmlhttprequest-sync-*
+secrets.js
