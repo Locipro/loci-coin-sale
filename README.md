@@ -3,13 +3,15 @@ In the interests of public disclosure and security, we're pleased to present the
 
 ![LOCIcoin](loci-logo.png)
 
-LOCI ADMIN STAFF: 
-John Wise - CEO 
-Brian Hwang - Director of Operations
-Eric Ross - Director of Technology
+## LOCI ADMIN STAFF: 
+```
+John Wise     - CEO 
+Brian Hwang   - Director of Operations
+Eric Ross     - Director of Technology
 Klajdi Ciraku - Community Management 
-Adam Paigge - Public Relations
-Dan Emmons - Blockchain Development
+Adam Paigge   - Public Relations
+Dan Emmons    - Blockchain Development
+```
 
 Telegram link: 
 https://t.me/Loci_InnVenn
