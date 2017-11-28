@@ -4,11 +4,12 @@ In the interests of public disclosure and security, we're pleased to present the
 ![LOCIcoin](loci-logo.png)
 
 LOCI ADMIN STAFF: 
-John Wise -CEO 
+John Wise - CEO 
 Brian Hwang - Director of Operations
-Eric Ross- Director of Technology
-Klajdi Ciraku- Community management 
-Adam Paigge -Public Relations
+Eric Ross - Director of Technology
+Klajdi Ciraku - Community Management 
+Adam Paigge - Public Relations
+Dan Emmons - Blockchain Development
 
 Telegram link: 
 https://t.me/Loci_InnVenn
@@ -40,7 +41,7 @@ Website https://locipro.com/
 Please see the [contracts/](contracts) directory.
 
 ## Bounty Program
-We want your input! If you're interested, please see the [LOCIcoin bounty program][bounty program] for participation details and instructions.
+We want your input! If you have any comments or concerns regarding this code, please contact the administration of the [LOCIcoin bounty program][bounty program] for participation details and instructions.
 
 ## Overview
 There are two primary contracts: `LOCIcoin.sol` (ERC-20 compliant token) and `LOCIsale.sol` (the crowdsale contract). Additionally, there is a simple shared interface defined in `IRefundHandler.sol` that allows `LOCIcoin` and `LOCIsale` to communicate refund requests and exchange wei contributions for received tokens. This refund mechanism will be triggered in the event that our sale goals are not met.
@@ -87,7 +88,23 @@ $ node_modules/.bin/truffle test
 patch node_modules/ethereumjs-testrpc/build/cli.node.js testrpc-time.patch
 ```
 
-## Build
+### Deploy to destination: development, ropsten, or live
+```
+$ truffle migrate --network <destination>
+```
+
+### secrets.js file - you will have to supply your own. sample format below.
+```
+var mnemonic = "some random selection of twelve words that you can use for metamask";
+var infuraKey = "aaaaaaaaaaaaaaaaaaa"; // get this form infura
+var accountPK = "your account primary key";
+var mainnetPK = accountPK;
+var ropstenPK = accountPK;
+
+module.exports = {mnemonic: mnemonic, infuraKey: infuraKey, mainnetPK: mainnetPK, ropstenPK:ropstenPK};
+```
+
+## Alternative Build
 For easy deployment via Mist, simply concatenate all contracts using [`solidity_flattener`][solidity flattener].
 ```
 solidity_flattener --solc-paths "zeppelin-solidity=<absolute path to your files>/node_modules/zeppelin-solidity" contracts/LOCIcoin.sol > UnifiedLOCIcoin.sol

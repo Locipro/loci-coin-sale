@@ -9,27 +9,36 @@ module.exports = (deployer, network, accounts) => {
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
     let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents, saleSupplyAllocation;     
 
-    
-        peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
+    console.log('Preparing for deployment...');
+    peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
+    deployAddress = accounts[0]; // by convention
+    totalSupply =           new BigNumber(100000000000000000000000000); // 100Million in wei
+    saleSupplyAllocation =  new BigNumber( 45000000000000000000000000); //  45Million in wei                
+    reservedTokens = new BigNumber(0);
+    hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
+    minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
+    minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
+    maximumContribution = new BigNumber(64000 * Math.pow(10,18)); // 64000 ETH in wei;
+    start = Math.ceil((new Date()).getTime() / 1000);
+    baseRateInCents = 250; // $2.50 equals 250 cents
+    isPresale = true;
+    hours = 600; // total number of hours
+    discounts = [
+        48,  33, // first  48 hours, 0.33 price (2 days)
+        168, 44, // next  168 hours, 0.44 price (7 days)
+        168, 57, // next  168 hours, 0.57 price (7 days)
+        216, 75, // final 216 hours, 0.75 price (9 days)
+    ];
 
-        deployAddress = accounts[0];
-        totalSupply =           new BigNumber(100000000000000000000000000); // 100Million in wei
-        saleSupplyAllocation =  new BigNumber( 45000000000000000000000000); //  45Million in wei                
-        reservedTokens = new BigNumber(0);
-        hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
-        minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
-        minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
-        maximumContribution = new BigNumber(64000 * Math.pow(10,18)); // 64000 ETH in wei;
-        start = Math.ceil((new Date()).getTime() / 1000);
-        baseRateInCents = 250; // $2.50 equals 250 cents
-        isPresale = true;
-        hours = 600; // total number of hours
-        discounts = [
-            48, 33,  // first  48 hours, 0.33 price (2 days)
-            168, 44, // next  168 hours, 0.44 price (7 days)
-            168, 57, // next  168 hours, 0.57 price (7 days)
-            216, 75, // final 216 hours, 0.75 price (9 days)
-        ];
+    if( network == "live" ) {
+        console.log( 'start=' + start );
+        console.log( 'changing start to 1512518400 for live deployment.' );
+        start = 1512518400;
+        console.log( 'start=' + start );        
+        throw "Halt. Sanity check. Not ready for deployment to live network. Manually remove this throw and try again.";
+    }
+
+    console.log('start=' + start);
     
     console.log('deploying from:' + deployAddress);
     console.log('deploying SafeMath and Ownable');
