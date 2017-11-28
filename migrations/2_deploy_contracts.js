@@ -1,5 +1,6 @@
 const SafeMath = artifacts.require('zeppelin-solidity/contracts/math/SafeMath.sol');
-const Ownable = artifacts.require('zeppelin-solidity/contracts/math/Ownable.sol');
+const Ownable = artifacts.require('zeppelin-solidity/contracts/ownership/Ownable.sol');
+const Contactable = artifacts.require('zeppelin-solidity/contracts/ownership/Contactable.sol');
 const LOCIcoin = artifacts.require("./LOCIcoin.sol");
 const LOCIsale = artifacts.require("./LOCIsale.sol");
 
@@ -41,13 +42,15 @@ module.exports = (deployer, network, accounts) => {
     console.log('start=' + start);
     
     console.log('deploying from:' + deployAddress);
-    console.log('deploying SafeMath and Ownable');
+    console.log('deploying SafeMath Ownable Contactable');
     deployer.deploy(SafeMath, {from: deployAddress});
     deployer.deploy(Ownable, {from: deployAddress});
+    deployer.deploy(Contactable, {from: deployAddress});
 
-    console.log('linking Ownable and SafeMath');
+    console.log('linking Ownable SafeMath Contactable');
     deployer.link(Ownable, [LOCIcoin, LOCIsale], {from: deployAddress});
     deployer.link(SafeMath, [LOCIcoin, LOCIsale], {from: deployAddress});
+    deployer.link(Contactable, [LOCIcoin, LOCIsale], {from: deployAddress});
 
     console.log('deploying LOCIcoin');      
     deployer.deploy(LOCIcoin, totalSupply, 'LOCIpro.com', {from: deployAddress}).then(() => {
