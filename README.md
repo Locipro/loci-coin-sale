@@ -98,7 +98,7 @@ $ truffle migrate --network <destination>
 ### secrets.js file - you will have to supply your own. sample format below.
 ```
 var mnemonic = "some random selection of twelve words that you can use for metamask";
-var infuraKey = "aaaaaaaaaaaaaaaaaaa"; // get this form infura
+var infuraKey = "aaaaaaaaaaaaaaaaaaa"; // get this from infura
 var accountPK = "your account primary key";
 var mainnetPK = accountPK;
 var ropstenPK = accountPK;
