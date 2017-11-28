@@ -9,12 +9,12 @@ module.exports = (deployer, network, accounts) => {
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
     let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents;     
 
-    if (network === 'development') {
+    
         peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
 
         deployAddress = accounts[0];
         totalSupply =    new BigNumber(100000000 * Math.pow(10,18)); // 100Million
-        reservedTokens = new BigNumber( 54000000 * Math.pow(10,18)); // 54Million (50M reserve + 4M presale)
+        reservedTokens = new BigNumber(0);
         hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
         minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
         minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
@@ -29,15 +29,19 @@ module.exports = (deployer, network, accounts) => {
             168, 57, // next  168 hours, 0.57 price (7 days)
             216, 75, // final 216 hours, 0.75 price (9 days)
         ];
-    }
-
+    
+    console.log('deploying from:' + deployAddress);
+    console.log('deploying SafeMath and Ownable');
     deployer.deploy(SafeMath, {from: deployAddress});
     deployer.deploy(Ownable, {from: deployAddress});
 
+    console.log('linking Ownable and SafeMath');
     deployer.link(Ownable, [LOCIcoin, LOCIsale], {from: deployAddress});
     deployer.link(SafeMath, [LOCIcoin, LOCIsale], {from: deployAddress});
 
+    console.log('deploying LOCIcoin');      
     deployer.deploy(LOCIcoin, totalSupply, {from: deployAddress}).then(() => {
+        console.log('deploying LOCIsale with LOCIcoin address ' + totalSupply );      
         return deployer.deploy(LOCIsale,
             LOCIcoin.address,
             peggedETHUSD,
@@ -53,4 +57,5 @@ module.exports = (deployer, network, accounts) => {
             discounts.map(v => new BigNumber(v)),
             {from: deployAddress});
     });
+    
 };
