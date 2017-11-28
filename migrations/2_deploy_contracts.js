@@ -7,13 +7,14 @@ const BigNumber = require('bignumber.js');
 
 module.exports = (deployer, network, accounts) => {
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
-    let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents;     
+    let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents, saleSupplyAllocation;     
 
     
         peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
 
         deployAddress = accounts[0];
-        totalSupply =    new BigNumber(100000000000000000000000000); // 100Million in wei
+        totalSupply =           new BigNumber(100000000000000000000000000); // 100Million in wei
+        saleSupplyAllocation =  new BigNumber( 50000000000000000000000000); //  50Million in wei                
         reservedTokens = new BigNumber(0);
         hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
         minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
@@ -70,8 +71,7 @@ module.exports = (deployer, network, accounts) => {
                     sale = saleInstance;
                     return coin.ownerSetOverride(saleInstance.address, true, {from: deployAddress});
                 }).then( function(resultOfOverride) {
-                    console.log('resultOfOverride:' + resultOfOverride);
-                    var saleSupplyAllocation = 50000000000000000000000000;                
+                    console.log('resultOfOverride:' + resultOfOverride);                    
                     return coin.transfer(sale.address, saleSupplyAllocation, {from: deployAddress});
                 }).then( function(resultOfTransfer) {
                     console.log('resultOfTransfer:' + resultOfTransfer);
