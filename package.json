@@ -8,7 +8,10 @@
     "test": "test"
   },
   "devDependencies": {
-    "babel-register": "^6.26.0"
+    "babel-register": "^6.26.0",
+    "dotenv": "^4.0.0",
+    "ethereumjs-wallet": "^0.6.0",
+    "truffle-wallet-provider": "0.0.5"
   },
   "dependencies": {
     "babel-polyfill": "^6.26.0",
