@@ -14,7 +14,7 @@ module.exports = (deployer, network, accounts) => {
 
         deployAddress = accounts[0];
         totalSupply =           new BigNumber(100000000000000000000000000); // 100Million in wei
-        saleSupplyAllocation =  new BigNumber( 50000000000000000000000000); //  50Million in wei                
+        saleSupplyAllocation =  new BigNumber( 45000000000000000000000000); //  45Million in wei                
         reservedTokens = new BigNumber(0);
         hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
         minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
@@ -23,7 +23,7 @@ module.exports = (deployer, network, accounts) => {
         start = Math.ceil((new Date()).getTime() / 1000);
         baseRateInCents = 250; // $2.50 equals 250 cents
         isPresale = true;
-        hours = 600; // 5 days in hours + 10 hours for 0% discount testing
+        hours = 600; // total number of hours
         discounts = [
             48, 33,  // first  48 hours, 0.33 price (2 days)
             168, 44, // next  168 hours, 0.44 price (7 days)
@@ -41,7 +41,7 @@ module.exports = (deployer, network, accounts) => {
     deployer.link(SafeMath, [LOCIcoin, LOCIsale], {from: deployAddress});
 
     console.log('deploying LOCIcoin');      
-    deployer.deploy(LOCIcoin, totalSupply, 'overcome bug in truffle', {from: deployAddress}).then(() => {
+    deployer.deploy(LOCIcoin, totalSupply, 'LOCIpro.com', {from: deployAddress}).then(() => {
         console.log('deploying LOCIsale with LOCIcoin address ' );      
         return deployer.deploy(LOCIsale,
             LOCIcoin.address,
@@ -81,6 +81,9 @@ module.exports = (deployer, network, accounts) => {
                     return coin.balanceOf(sale.address);
                 }).then( function(resultOfBalanceForSaleAddress) {
                     console.log('resultOfBalanceForSaleAddress:' + resultOfBalanceForSaleAddress);                    
+                    return coin.contactInformation.call();
+                }).then( function(resultOfContactInformation) {
+                    console.log('resultOfContactInformation:' + resultOfContactInformation);                                        
                 });
                 
 

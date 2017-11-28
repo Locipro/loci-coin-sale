@@ -37,8 +37,9 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
 
     event TokenActivated();
 
-    function LOCIcoin(uint256 _totalSupply, string _unusedTruffleValue ) public {
+    function LOCIcoin(uint256 _totalSupply, string _contactInformation ) public {
         totalSupply = _totalSupply;
+        contactInformation = _contactInformation;
 
         // msg.sender == owner of the contract
         balances[msg.sender] = _totalSupply;
