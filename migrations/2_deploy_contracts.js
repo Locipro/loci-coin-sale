@@ -13,7 +13,7 @@ module.exports = (deployer, network, accounts) => {
         peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
 
         deployAddress = accounts[0];
-        totalSupply =    new BigNumber(100000000 * Math.pow(10,18)); // 100Million
+        totalSupply =    new BigNumber(100000000000000000000000000); // 100Million in wei
         reservedTokens = new BigNumber(0);
         hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
         minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
@@ -40,8 +40,8 @@ module.exports = (deployer, network, accounts) => {
     deployer.link(SafeMath, [LOCIcoin, LOCIsale], {from: deployAddress});
 
     console.log('deploying LOCIcoin');      
-    deployer.deploy(LOCIcoin, totalSupply, {from: deployAddress}).then(() => {
-        console.log('deploying LOCIsale with LOCIcoin address ' + totalSupply );      
+    deployer.deploy(LOCIcoin, totalSupply, 'overcome bug in truffle', {from: deployAddress}).then(() => {
+        console.log('deploying LOCIsale with LOCIcoin address ' );      
         return deployer.deploy(LOCIsale,
             LOCIcoin.address,
             peggedETHUSD,
@@ -55,7 +55,38 @@ module.exports = (deployer, network, accounts) => {
             new BigNumber(hours),
             new BigNumber(baseRateInCents),
             discounts.map(v => new BigNumber(v)),
-            {from: deployAddress});
+            {from: deployAddress}).then( function(result) {
+
+                var coin;
+                var sale;
+
+                LOCIcoin.deployed().then(function(instance) {
+                    coin = instance;
+                    return instance;
+                }).then( function(coinInstance){
+                    coinInstance.totalSupply.call().then( console.log );
+                    return LOCIsale.deployed();
+                }).then( function(saleInstance){                    
+                    sale = saleInstance;
+                    return coin.ownerSetOverride(saleInstance.address, true, {from: deployAddress});
+                }).then( function(resultOfOverride) {
+                    console.log('resultOfOverride:' + resultOfOverride);
+                    var saleSupplyAllocation = 50000000000000000000000000;                
+                    return coin.transfer(sale.address, saleSupplyAllocation, {from: deployAddress});
+                }).then( function(resultOfTransfer) {
+                    console.log('resultOfTransfer:' + resultOfTransfer);
+                    return coin.balanceOf(deployAddress);
+                }).then( function(resultOfBalanceForDeployAddress) {
+                    console.log('resultOfBalanceForDeployAddress:' + resultOfBalanceForDeployAddress);
+                    return coin.balanceOf(sale.address);
+                }).then( function(resultOfBalanceForSaleAddress) {
+                    console.log('resultOfBalanceForSaleAddress:' + resultOfBalanceForSaleAddress);                    
+                });
+                
+
+            });
     });
+
+
     
 };

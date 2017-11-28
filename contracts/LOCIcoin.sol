@@ -37,10 +37,11 @@ contract LOCIcoin is StandardToken, Ownable, Contactable {
 
     event TokenActivated();
 
-    function LOCIcoin(uint256 _totalSupply) public {
+    function LOCIcoin(uint256 _totalSupply, string _unusedTruffleValue ) public {
         totalSupply = _totalSupply;
+
         // msg.sender == owner of the contract
-        balances[msg.sender] = totalSupply;
+        balances[msg.sender] = _totalSupply;
     }
 
     /// @dev Same ERC20 behavior, but reverts if not yet active.
