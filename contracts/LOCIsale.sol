@@ -69,7 +69,7 @@ contract LOCIsale is Ownable, Pausable, IRefundHandler {
         uint256 _minFundingGoalWei,     /* If we are looking to raise a minimum amount of wei, put it here */
         uint256 _minContributionWei,    /* For LOCI this will be 0.1 ETH */
         uint256 _maxContributionWei,    /* Advisable to not let a single contributor go over the max alloted, say 63333 * Math.pow(10,18) wei. */
-        uint256 _start,                 /* For LOCI this will be */
+        uint256 _start,                 /* For LOCI this will be Dec 6th 0:00 UTC in seconds */
         uint256 _durationHours,         /* Total length of the sale, in hours */
         uint256 _baseRateInCents,       /* Base rate in cents. $2.50 would be 250 */
         uint256[] _hourBasedDiscounts   /* Single dimensional array of pairs [hours, rateInCents, hours, rateInCents, hours, rateInCents, ... ] */
@@ -138,7 +138,7 @@ contract LOCIsale is Ownable, Pausable, IRefundHandler {
             }
         }
 
-        // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/3, move to next tranche
+        // Example: there are 4 rounds, and we want to divide rounds 2-4 equally based on (starting-round1)/(discountTranches.length-1), move to next tranche
         // But don't move past the last round. Note, the last round should not be capped. That's why we check for round < # tranches
         if (_dt.round > 1 && _dt.roundTokensSold > 0 && _dt.round < discountTranches.length) {
             uint256 _trancheCountExceptForOne = discountTranches.length-1;
@@ -300,7 +300,7 @@ contract LOCIsale is Ownable, Pausable, IRefundHandler {
     function ownerRecoverTokens(address _beneficiary) external onlyOwner {
         require(_beneficiary != 0x0);
         require(_beneficiary != address(token));
-        require(now > end);
+        require(paused || now > end);
 
         uint256 _tokensRemaining = token.balanceOf(address(this));
         if (_tokensRemaining > 0) {

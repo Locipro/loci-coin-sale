@@ -17,7 +17,7 @@ module.exports = (deployer, network, accounts) => {
     saleSupplyAllocation =  new BigNumber( 45000000000000000000000000); //  45Million in wei                
     reservedTokens = new BigNumber(0);
     hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
-    minimumGoal = new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
+    minimumGoal = 0; // new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
     minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
     maximumContribution = new BigNumber(64000 * Math.pow(10,18)); // 64000 ETH in wei;
     start = Math.ceil((new Date()).getTime() / 1000);
