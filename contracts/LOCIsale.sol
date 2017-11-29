@@ -243,9 +243,17 @@ contract LOCIsale is Ownable, Pausable, IRefundHandler {
     // in case we need to return funds to this contract
     function ownerTopUp() external payable {}
 
+    function setReservedTokens( uint256 _reservedTokens ) onlyOwner public {
+        reservedTokens = _reservedTokens;        
+    }
+
     function pegETHUSD(uint256 _peggedETHUSD) onlyOwner public {
         peggedETHUSD = _peggedETHUSD;
         PegETHUSD(peggedETHUSD);
+    }
+
+    function setHardCap( uint256 _hardCap ) onlyOwner public {
+        hardCap = _hardCap;
     }
 
     function peggedETHUSD() constant onlyOwner public returns(uint256) {
