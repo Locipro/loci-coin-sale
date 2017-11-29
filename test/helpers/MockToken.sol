@@ -4,7 +4,7 @@ import '../../contracts/LOCIcoin.sol';
 
 
 contract MockToken is LOCIcoin {
-    function MockToken(uint256 _totalSupply) LOCIcoin(_totalSupply, 'workaround for truffle deployment bug'){}
+    function MockToken(uint256 _totalSupply) LOCIcoin(_totalSupply, 'MockToken.com'){}
 
     function isAllowedOverrideAddress(address _addr) external constant returns (bool) {
         return allowedOverrideAddresses[_addr];
