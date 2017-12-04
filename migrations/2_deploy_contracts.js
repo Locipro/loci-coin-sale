@@ -11,16 +11,16 @@ module.exports = (deployer, network, accounts) => {
     let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents, saleSupplyAllocation;     
 
     console.log('Preparing for deployment...');
-    peggedETHUSD = 300; // always specified in whole USD. 300 = $300   
+    peggedETHUSD = 461; // always specified in whole USD. 461 = $461   
     deployAddress = accounts[0]; // by convention
     totalSupply =           new BigNumber(100000000000000000000000000); // 100Million in wei
-    saleSupplyAllocation =  new BigNumber( 45000000000000000000000000); //  45Million in wei                
-    reservedTokens = new BigNumber(0);
-    hardCapETHinWei = new BigNumber(   64000 * Math.pow(10,18)); // 64000 ETH in wei
-    minimumGoal = 0; // new BigNumber(50000 * Math.pow(10,18)); // 50000 ETH in wei
+    saleSupplyAllocation =  new BigNumber( 55000000000000000000000000); //  55Million in wei                
+    reservedTokens =        new BigNumber(  5000000000000000000000000); //   5Million in wei
+    hardCapETHinWei = new BigNumber(   38800 * Math.pow(10,18)); // 38800 ETH in wei
+    minimumGoal = 0; 
     minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
-    maximumContribution = new BigNumber(64000 * Math.pow(10,18)); // 64000 ETH in wei;
-    start = Math.ceil((new Date()).getTime() / 1000);
+    maximumContribution = new BigNumber(38800 * Math.pow(10,18)); // 38800 ETH in wei;
+    start = 1512409500; // Monday Dec 4th @1145am Central - testing before launch // Math.ceil((new Date()).getTime() / 1000);
     baseRateInCents = 250; // $2.50 equals 250 cents
     isPresale = true;
     hours = 600; // total number of hours
@@ -74,12 +74,14 @@ module.exports = (deployer, network, accounts) => {
                 var sale;
 
                 LOCIcoin.deployed().then(function(instance) {
+                    console.log( 'assigning coin instance' );
                     coin = instance;
                     return instance;
                 }).then( function(coinInstance){
                     coinInstance.totalSupply.call().then( console.log );
                     return LOCIsale.deployed();
-                }).then( function(saleInstance){                    
+                }).then( function(saleInstance){ 
+                    console.log( 'assigning sale instance' );                   
                     sale = saleInstance;
                     return coin.ownerSetOverride(saleInstance.address, true, {from: deployAddress});
                 }).then( function(resultOfOverride) {
