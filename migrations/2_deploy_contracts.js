@@ -20,7 +20,7 @@ module.exports = (deployer, network, accounts) => {
     minimumGoal = 0; 
     minimumContribution = new BigNumber(0.1 * Math.pow(10,18)); // 0.1 ETH in wei;
     maximumContribution = new BigNumber(38800 * Math.pow(10,18)); // 38800 ETH in wei;
-    start = 1512409500; // Monday Dec 4th @1145am Central - testing before launch // Math.ceil((new Date()).getTime() / 1000);
+    start = 1512518400; // DEC 6 00:00:00 UTC
     baseRateInCents = 250; // $2.50 equals 250 cents
     isPresale = true;
     hours = 600; // total number of hours
