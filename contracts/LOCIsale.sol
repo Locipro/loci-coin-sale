@@ -282,6 +282,10 @@ contract LOCIsale is Ownable, Pausable, IRefundHandler {
         return weiRaised;
     }
 
+    function setStartingTokensAmount(uint256 _startingTokensAmount) onlyOwner public {
+        startingTokensAmount = _startingTokensAmount;
+    }
+
     function ownerEnableRefunds() external onlyOwner {
         // a little protection against human error;
         // sale must be ended OR it must be paused
