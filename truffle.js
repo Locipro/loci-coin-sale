@@ -26,6 +26,12 @@ module.exports = {
       network_id: "*",
       gas: 6699331
     },
+    docker: {
+      host: "192.168.99.100",
+      port: 8545,
+      network_id: "*",
+      gas: 3141592
+    },
     ropsten: {
       provider: ropstenProvider, //new HDWalletProvider(secrets.mnemonic, "https://ropsten.infura.io/" + secrets.infuraKey),
       network_id: "3",
