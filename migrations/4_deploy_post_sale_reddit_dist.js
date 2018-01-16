@@ -3,7 +3,7 @@ const Ownable = artifacts.require('zeppelin-solidity/contracts/ownership/Ownable
 const Contactable = artifacts.require('zeppelin-solidity/contracts/ownership/Contactable.sol');
 const LOCIcoin = artifacts.require("./LOCIcoin.sol");
 const LOCIsale = artifacts.require("./LOCIsale.sol");
-const LOCIreferrals = artifacts.require("./LOCIreferrals.sol");
+const LOCIreddit = artifacts.require("./LOCIreddit.sol");
 
 const BigNumber = require('bignumber.js');
 
@@ -24,18 +24,18 @@ module.exports = (deployer, network, accounts) => {
     deployer.deploy(Contactable, {from: deployAddress});
     
     console.log('linking Ownable SafeMath Contactable');
-    deployer.link(Ownable, [LOCIreferrals], {from: deployAddress});
-    deployer.link(SafeMath, [LOCIreferrals], {from: deployAddress});
-    deployer.link(Contactable, [LOCIreferrals], {from: deployAddress});
+    deployer.link(Ownable, [LOCIreddit], {from: deployAddress});
+    deployer.link(SafeMath, [LOCIreddit], {from: deployAddress});
+    deployer.link(Contactable, [LOCIreddit], {from: deployAddress});
     
     let coinOwner = "0x1e35343c175038a8aac75a391524c14a01b1a1b0";
     let bonusTokenSupply = 10000000000000000000000000; // ten million should do it.
     let bonusTokenDistribution;
 
-    console.log('deploying LOCIreferrals');      
-    deployer.deploy(LOCIreferrals, LOCIcoin.address, 'LOCIpro.com', {from: deployAddress}).then(() => {        
+    console.log('deploying LOCIreddit');      
+    deployer.deploy(LOCIreddit, LOCIcoin.address, 'LOCIpro.com', {from: deployAddress}).then(() => {        
         
-        LOCIreferrals.deployed().then(function(_bonusTokenDistribution) {
+        LOCIreddit.deployed().then(function(_bonusTokenDistribution) {
             console.log( 'assigning bonusTokenDistribution instance' );
             bonusTokenDistribution = _bonusTokenDistribution;
             return LOCIcoin.deployed();
