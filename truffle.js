@@ -48,7 +48,7 @@ module.exports = {
     live: {
       provider: mainNetProvider, //new HDWalletProvider(secrets.mnemonic, "https://mainnet.infura.io/" + secrets.infuraKey),
       network_id: "1",
-      gas: 6700000
+      gas: 7500000
       //gas: 6699331
       //gas: 4600000
     }
