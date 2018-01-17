@@ -39,6 +39,14 @@ contract LOCIreddit is Ownable, Contactable {
         hasDoneRedditChunkThree = false;
         hasDoneRedditChunkFour = false;        
     }    
+
+    /*function distributeEverything() onlyOwner public {
+        distributeRedditChunkOne();
+        distributeRedditChunkTwo();
+        distributeRedditChunkThree();
+        distributeRedditChunkFour();
+    }*/
+    
     
     function distributeRedditChunkOne() onlyOwner public {
         require(!hasDoneRedditChunkOne);  

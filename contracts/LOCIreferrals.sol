@@ -68,6 +68,20 @@ contract LOCIreferrals is Ownable, Contactable {
         hasDoneBountyArticles = false;
     }
 
+    /*function distributeEverything() onlyOwner public {
+        distributeSAFTAdjustments();
+        distributeSAFTAdvisorsFriends();
+        distributePartners();
+        distributePromotions();
+        distributeOther();
+        distributeReferrals();
+        distributeTransferDifficulties();
+        distributeBountySignatures();
+        distributeTwitter();
+        distributeBountyTranslations();
+        distributeBountyArticles();
+    }*/
+
     function distributeSAFTAdjustments() onlyOwner public {
         require(!hasDoneSAFTAdjustments);        
 
@@ -87,6 +101,7 @@ contract LOCIreferrals is Ownable, Contactable {
         token.transfer(parseAddr("0xfc519D30F2E0C6973492a63128E4855286B0E37"),137172800000000000000000);
         token.transfer(parseAddr("0xA7105Ac2204F20A6cB131fd111b13c3405e9480"),142675680000000000000000);
 
+
         hasDoneSAFTAdjustments = true;
         DistributedSAFTAdjustments();
     }
@@ -95,7 +110,7 @@ contract LOCIreferrals is Ownable, Contactable {
         require(!hasDoneSAFTAdvisorsFriends);
 
         // Staff Advisors/Friends
-        token.transfer(parseAddr("0x48a37B2AE94C3EEA5eec61f3886b9bE2968c0C6"),150000000000000000000000);
+        token.transfer(parseAddr("0x48a37B2AE94C3EEA5eec61f3886b9bE2968c0C68"),200146000000000000000000);
         token.transfer(parseAddr("0x47c59768A1CFfA4c29cd67eE006E564595B270A"),50000000000000000000000);
         token.transfer(parseAddr("0xCF107641EA1F41518a996467EFFAB38cD527b13"),50000000000000000000000);
         token.transfer(parseAddr("0x15d68830008836156652A07413710eFD872abf0"),83333000000000000000000);
@@ -107,6 +122,11 @@ contract LOCIreferrals is Ownable, Contactable {
         token.transfer(parseAddr("0x1A11b843B45357226a0EAdb088a59fbe698B3BD"),20833000000000000000000);
         token.transfer(parseAddr("0xF6eAe19752487761eac0e3a7a5E8C990EfEf35C"),25000000000000000000000);
         token.transfer(parseAddr("0x0aD087e108F122dcdF05E4f5358be7e7D3E482c"),20833000000000000000000);
+        token.transfer(parseAddr("0x8eE8a4e56cE67C040f05CbD367593a3a1e4Ee152"), 154620480000000000000000);
+        token.transfer(parseAddr("0x2d3887479Fc9B4EA9C3D3a9DcF2a3253D7a973dD"), 41667000000000000000000);
+        token.transfer(parseAddr("0xF5617511AeA146f35F9a643520bf9229c4Cf394b"), 20833000000000000000000);
+        token.transfer(parseAddr("0x0B216e84422576456e9f350C100A81DA405d51d0"), 50000000000000000000000);
+        token.transfer(parseAddr("0x73a83Ec5f46a64C516F1020B89BaD061d92BD9db"), 50000000000000000000000);
 
         hasDoneSAFTAdvisorsFriends = true;
         DistributedSAFTAdvisorsFriends();
@@ -154,7 +174,7 @@ contract LOCIreferrals is Ownable, Contactable {
         require(!hasDoneOther);
 
         // Other 
-        token.transfer(parseAddr("0x48a37B2AE94C3EEA5eec61f3886b9bE2968c0C6"),64797350000000000000000);
+        token.transfer(parseAddr("0x48a37B2AE94C3EEA5eec61f3886b9bE2968c0C68"),76911520000000000000000);
         token.transfer(parseAddr("0x70e6FFE5eB342314326e32316f459741cC21953"),106947000000000000000000);
 
         hasDoneOther = true;
