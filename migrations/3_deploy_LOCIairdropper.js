@@ -14,7 +14,7 @@ module.exports = (deployer, network, accounts) => {
     
     if( network == "live" ) {    
         console.log("Using LOCIcoin at:" + LOCIcoin.address);
-        //throw "Halt. Sanity check. Not ready for deployment to live network. Manually remove this throw and try again.";
+        throw "Halt. Sanity check. Not ready for deployment to live network. Manually remove this throw and try again.";
     }
 
     console.log('deploying from:' + deployAddress);
@@ -29,6 +29,6 @@ module.exports = (deployer, network, accounts) => {
     deployer.link(Contactable, [LOCIairdropper], {from: deployAddress});    
     
     console.log('deploying LOCIairdropper');      
-    deployer.deploy(LOCIairdropper, LOCIcoin.address, 'LOCIpro.com', {from: deployAddress, overwrite: false});    
+    deployer.deploy(LOCIairdropper, LOCIcoin.address, 'LOCIpro.com', {from: deployAddress});    
     
 };

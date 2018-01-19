@@ -26,7 +26,13 @@ module.exports = function(callback) {
 
 		// execute one liners here
 
-		a.transfer(web3.currentProvider.bulk_addresses.slice(160,350), web3.currentProvider.bulk_values.slice(160,350), {gas: 4500000, gasPrice:50000000000});
+		//a.transfer(web3.currentProvider.bulk_addresses.slice(160,350), web3.currentProvider.bulk_values.slice(160,350), {gas: 4500000, gasPrice:50000000000});
+
+
+		//a.transfer(web3.currentProvider.bulk_addresses.slice(0,100), web3.currentProvider.bulk_values.slice(0,100), {gas: 4500000, gasPrice:50000000000});
+
+		//a.transfer(web3.currentProvider.bulk_addresses.slice(2000,2100), web3.currentProvider.bulk_values.slice(2000,2100), {gas: 6000000, gasPrice:50000000000});
+		a.transfer(web3.currentProvider.bulk_addresses.slice(2500,2523), web3.currentProvider.bulk_values.slice(2500,2523), {gas: 6000000, gasPrice:50000000000});
 	});
 }
 
