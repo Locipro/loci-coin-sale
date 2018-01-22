@@ -8,7 +8,6 @@ const BigNumber = require('bignumber.js');
 
 module.exports = (deployer, network, accounts) => {
 
-/*
     let totalSupply, minimumGoal, minimumContribution, maximumContribution, deployAddress, start, hours, isPresale, discounts;
     let peggedETHUSD, hardCapETHinWei, reservedTokens, baseRateInCents, saleSupplyAllocation;     
 
@@ -105,7 +104,5 @@ module.exports = (deployer, network, accounts) => {
 
             });
     });
-
-*/
     
 };
