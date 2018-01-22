@@ -46,7 +46,9 @@ Please see the [contracts/](contracts) directory.
 We want your input! If you have any comments or concerns regarding this code, please contact the administration of the [LOCIcoin bounty program][bounty program] for participation details and instructions.
 
 ## Overview
-There are two primary contracts: `LOCIcoin.sol` (ERC-20 compliant token) and `LOCIsale.sol` (the crowdsale contract). Additionally, there is a simple shared interface defined in `IRefundHandler.sol` that allows `LOCIcoin` and `LOCIsale` to communicate refund requests and exchange wei contributions for received tokens. This refund mechanism will be triggered in the event that our sale goals are not met.
+There are two primary contracts: `LOCIcoin.sol` (ERC-20 compliant token) and `LOCIsale.sol` (the crowdsale contract). Additionally, there is a simple shared interface defined in `IRefundHandler.sol` that allows `LOCIcoin` and `LOCIsale` to communicate refund requests and exchange wei contributions for received tokens. This refund mechanism will be triggered in the event that our sale goals are not met. 
+
+After the initial `LOCIcoin` sale, it might be necessary to issue adjustments to crowd sale participants, or to issue bonus tokens based on referrals, for example. We have constructed the `LOCIairdropper.sol` smart contract to make it easy to distribute bulk token transfers in far fewer calls than one-at-a-time usage of the `LOCIcoin.sol` contract.
 
 ### LOCIcoin
 Deriving from OpenZeppelin's ERC-20 compliant base contracts, `LOCIcoin` has the same core functionality the Ethereum ecosystem has come to expect, with minor modifications:
@@ -66,6 +68,13 @@ While not directly deriving from existing crowdsale contracts, `LOCIsale` is bas
 1. Ability to transfer wei to beneficiary (after sale end and if optional min goal has been met)
 1. Ability to recover (transfer) unsold tokens
 1. Contributions via contract default/fallback function for user simplicity
+1. Ability to change the peg price of ether to USD during the course of the sale to account for volatile markets.
+1. Ability to change the reserved number of tokens for the sale in the event of off-chain purchases.
+
+### LOCIairdropper
+This contract allows for the efficient administration of token distribution post-sale. Sufficient gas should be supplied.
+1. Ability to pass in 2 lists: a) Ethereum addresses and b) Token distribution amounts in wei.
+1. When all transfers are complete, an Event is fired with the number of addresses that received AirDroppedTokens.
 
 ## Develop
 Contracts are written in [Solidity][solidity] and tested using [Truffle][truffle] and [testrpc][testrpc]. ERC20-related and other base contracts sourced from [OpenZeppelin.org][openzeppelin].
