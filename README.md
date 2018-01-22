@@ -50,14 +50,14 @@ There are two primary contracts: `LOCIcoin.sol` (ERC-20 compliant token) and `LO
 
 After the initial `LOCIcoin` sale, it might be necessary to issue adjustments to crowd sale participants, or to issue bonus tokens based on referrals, for example. We have constructed the `LOCIairdropper.sol` smart contract to make it easy to distribute bulk token transfers in far fewer calls than one-at-a-time usage of the `LOCIcoin.sol` contract.
 
-### LOCIcoin
+### LOCIcoin https://etherscan.io/address/0x9c23d67aea7b95d80942e3836bcdf7e708a747c2
 Deriving from OpenZeppelin's ERC-20 compliant base contracts, `LOCIcoin` has the same core functionality the Ethereum ecosystem has come to expect, with minor modifications:
 1. Upon initial deployment, the token has no `symbol` or `name` set; it is set via `ownerSetVisible()`
 1. Token transfers are disabled until after the crowdsales are successfully completed, at which point the token will be 'activated' via `ownerActivateToken()`
 1. To ensure that contributors receive their tokens during the sale, the ability to `ownerSetOverride()` addresses has been added (allows override addresses to use `transfer()`)
 1. In the event that refunds are enabled in the sale contract, token holders can exchange their tokens for ether by calling the `claimRefund()` method
 
-### LOCIsale
+### LOCIsale https://etherscan.io/address/0x5401bb4729bd7f025b97399c3c92854ec299f81a
 While not directly deriving from existing crowdsale contracts, `LOCIsale` is based on the simplest combination of [OpenZeppelin code][openzeppelin], other successful crowdsale contracts, [best practices][best practices], as well as [security considerations][security concerns]. `LOCIsale` functionality includes:
 1. Flexible deployment options allows multiple sale scenarios (presale + primary ICO)
 1. Time-based tranche discounting
@@ -71,7 +71,7 @@ While not directly deriving from existing crowdsale contracts, `LOCIsale` is bas
 1. Ability to change the peg price of ether to USD during the course of the sale to account for volatile markets.
 1. Ability to change the reserved number of tokens for the sale in the event of off-chain purchases.
 
-### LOCIairdropper
+### LOCIairdropper https://etherscan.io/address/0xe5cff4de133f7c23898ce49dad5a3715f507d85d
 This contract allows for the efficient administration of token distribution post-sale. Sufficient gas should be supplied.
 1. Ability to pass in 2 lists: a) Ethereum addresses and b) Token distribution amounts in wei.
 1. When all transfers are complete, an Event is fired with the number of addresses that received AirDroppedTokens.
