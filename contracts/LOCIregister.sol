@@ -9,7 +9,10 @@ contract LOCIregister is Ownable, Contactable {
     using SafeMath for uint256;
     
     // this is the already deployed coin from the token sale
-    StandardToken token;            
+    StandardToken token;     
+
+    mapping (address => string) public names;
+    mapping (uint => string) public reasons;
 
     // Register every withdrawal we make from a linked LOCIsearch payment    
     event RegisterWithdrawal(address indexed register,      /* address the customer sent payment to */
@@ -45,6 +48,22 @@ contract LOCIregister is Ownable, Contactable {
             RegisterWithdrawal( _register[i], _beneficiary[i], _linked[i], _amount[i], _reason[i] );      
         }        
     }            
+
+    function setRegisterName( address _register, string _name ) onlyOwner public {
+        names[_register] = _name;
+    }
+
+    function getRegisterName( address _register ) onlyOwner public returns(string) {
+        return names[_register];
+    }
+
+    function setReason( uint _reason, string _name ) onlyOwner public {
+        reasons[_reason] = _name;
+    }
+
+    function getRegisterName( uint _reason ) onlyOwner public returns(string) {
+        return reasons[_reason];
+    }
 
     // in the event ether is accidentally sent to our contract, we can retrieve it
     function ownerTransferWei(address _beneficiary, uint256 _value) external onlyOwner {
