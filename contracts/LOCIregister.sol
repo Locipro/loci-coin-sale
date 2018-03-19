@@ -49,6 +49,17 @@ contract LOCIregister is Ownable, Contactable {
         }        
     }            
 
+    function withdrawSameAmountFromRegister( address _register, address _beneficiary, address[] _linked, uint256 _amount, uint _reason ) onlyOwner public {        
+
+        uint256 totalWithdrawal = _amount.mul( _linked.length );
+        token.transferFrom( _register, _beneficiary, totalWithdrawal );
+
+        for (uint i = 0; i < _linked.length; i += 1) {            
+            //token.transferFrom( _register, _beneficiary, _amount );
+            RegisterWithdrawal( _register, _beneficiary, _linked[i], _amount, _reason );      
+        }        
+    }
+
     function setRegisterName( address _register, string _name ) onlyOwner public {
         names[_register] = _name;
     }
