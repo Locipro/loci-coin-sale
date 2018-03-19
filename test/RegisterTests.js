@@ -49,16 +49,31 @@ contract('Register Tests', accounts => {
         account_four_starting_balance = await token.balanceOf.call(account_four);
         account_five_starting_balance = await token.balanceOf.call(account_five);
     });
-/*
-    it("should have the owner account set correctly", async () => {
-        assert.equal(owner, await token.owner.call(), "owner is not set correctly");
+
+    it("should have the register account set correctly", async () => {
+        assert.equal(owner, await register.owner.call(), "owner is not set correctly");
     });
 
-    it("should have blank name and symbol", async () => {
-        assert.equal(await register.names.call(token.address), '', "Register names is not blank");
+    it("should have blank names and reasons", async () => {
+        assert.equal(await register.names.call(owner), '', "Register names is not blank");
         assert.equal(await register.reasons.call(0), '', "Register reasons is not blank");
     });
-*/
+
+    it("should have defined names and reasons", async () => {
+
+        register.setRegisterName(owner,'LOCIcoin owner');
+        register.setReason( 0, 'Subscription' );
+        register.setReason( 1, 'Stake' );
+        register.setReason( 2, 'Bid' );
+        register.setReason( 3, 'Refund' );
+
+        assert.equal(await register.names.call(owner), 'LOCIcoin owner', "Register names is not blank");
+        assert.equal(await register.reasons.call(0), 'Subscription', "0 = Subscription");
+        assert.equal(await register.reasons.call(1), 'Stake', "1 = Stake");
+        assert.equal(await register.reasons.call(2), 'Bid', "2 = Bid");
+        assert.equal(await register.reasons.call(3), 'Refund', "3 = Refund");
+    });
+
     it("should have correct totalSupply", async () => {
         assert.equal((await token.totalSupply.call()).toNumber(), totalSupply, "totalSupply is not correct");
     });

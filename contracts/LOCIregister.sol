@@ -19,7 +19,7 @@ contract LOCIregister is Ownable, Contactable {
                              address indexed beneficiary,   /* recipent of funds after withdrawal   */ 
                              address indexed linked,        /* original linked customer address     */
                              uint256 amount,                /* amount of wei to transfer            */
-                             uint reason);                  /* 0=refund, 1=payment, 2=stake, 3=bid  */
+                             uint reason);                  /* 0=payment, 1=stake, 2=bid, 3=refund  */
 
     // After this contract is deployed, we will grant access to this contract
     // by calling methods on the LOCIcoin since we are using the same owner
