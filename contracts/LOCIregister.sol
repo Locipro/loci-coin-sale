@@ -9,7 +9,7 @@ contract LOCIregister is Ownable, Contactable {
     using SafeMath for uint256;
     
     // this is the already deployed coin from the token sale
-    StandardToken token;     
+    StandardToken internal token;     
 
     mapping (address => string) public names;
     mapping (uint => string) public reasons;
@@ -27,6 +27,7 @@ contract LOCIregister is Ownable, Contactable {
     function LOCIregister( address _token, string _contactInformation ) public {
         require(_token != 0x0);
 
+        owner = msg.sender;
         token = StandardToken(_token);
         contactInformation = _contactInformation;                                
     }     
