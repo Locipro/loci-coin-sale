@@ -71,9 +71,10 @@ const evm_mine = () => {
 };
 
 const verifyEvent = (txHash, eventSig) => {      
-    let txr = web3.eth.getTransactionReceipt(txHash);
-    for (let n in txr.logs) {        
-        if (txr.logs[n].topics && txr.logs[n].topics[0] === eventSig){            
+    let txr = web3.eth.getTransactionReceipt(txHash);    
+    for (let n in txr.logs) {     
+        //console.log(txr.logs[n].topics);   
+        if (txr.logs[n].topics && txr.logs[n].topics[0] === eventSig ){            
             return true;
         }
     }
