@@ -14,6 +14,7 @@
     "dotenv": "^4.0.0",
     "ethereumjs-wallet": "^0.6.0",
     "lodash": "^4.17.10",
+    "node-growl": "^0.1.1",
     "openzeppelin-solidity": "^1.12.0-rc.1",
     "truffle-wallet-provider": "0.0.5"
   },
