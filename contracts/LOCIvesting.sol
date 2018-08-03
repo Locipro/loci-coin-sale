@@ -11,6 +11,7 @@ import 'openzeppelin-solidity/contracts/token/ERC20/TokenVesting.sol';
  */
 contract LOCIvesting is TokenVesting {
 
+  ERC20Basic public loci;
   /**
    * @dev Creates a vesting contract that vests its balance of any ERC20 token to the
    * _beneficiary, gradually in a linear fashion until _start + _duration. By then all
@@ -22,12 +23,32 @@ contract LOCIvesting is TokenVesting {
    * @param _revocable whether the vesting is revocable or not
    */
   constructor(
+    ERC20Basic _loci,
     address _beneficiary,
     uint256 _start,
     uint256 _cliff,
     uint256 _duration,
     bool _revocable
   )
-    TokenVesting(_beneficiary, _start, _cliff, _duration, _revocable) public {}
+    TokenVesting(_beneficiary, _start, _cliff, _duration, _revocable) public {
+
+      loci = _loci;
+    }
+
+  function releaseLOCI() public {
+    release(loci);
+  }
+
+  function revokeLOCI() public onlyOwner {
+    revoke(loci);
+  }
+
+  function releasableAmountLOCI() public view returns (uint256) {
+    return releasableAmount(loci);
+  }
+
+  function vestedAmountLOCI() public view returns (uint256) {
+    return vestedAmount(loci);
+  }
 
 }
