@@ -191,9 +191,9 @@ contract('Sale Tests', accounts => {
         });
 
         it("should have non-zero balance but still less than minimum goal after first successful transaction attempt", async () => {
-            let minGoal = await sale.minFundingGoalWei.call();
+            let minGoal = await sale.minFundingGoalWei.call();            
             assert.notEqual(web3.eth.getBalance(sale.address).toNumber(), 0, "contract wei balance should not be zero");
-            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
+            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should less than minimum goal");
         });       
 
         it("should move to the second discount tranche when advancing time", async () => {
@@ -226,10 +226,10 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[6]);
 
             let new_balance_tokens = await token.balanceOf.call(accounts[6]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();            
             
             assert.isBelow(new_balance_tokens_estimate, 10999773, "Should have just under 10999773 tokens");
-            assert.isAbove(new_balance_tokens_estimate, 10999772, "Should have just over  10999772 tokens");
+            assert.isAbove(new_balance_tokens_estimate, 10999772, "Should have just over  10999771 tokens");
         });
 
 
@@ -251,7 +251,7 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[7]);
 
             let new_balance_tokens = await token.balanceOf.call(accounts[7]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );            
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();            
 
             assert.isBelow(new_balance_tokens_estimate,  5500001, "Should have just under 5500001 tokens");
             assert.isAbove(new_balance_tokens_estimate,  5499999, "Should have just over  5499999 tokens");
@@ -272,7 +272,7 @@ contract('Sale Tests', accounts => {
 
 
             let tokensRound3 = await sale.tokensRaisedDuringRound.call(3);                                                    
-            let tokensRound3_estimate = new BigNumber(tokensRound3).dividedBy( Math.pow(10,18) );                        
+            let tokensRound3_estimate = new BigNumber(tokensRound3).dividedBy( Math.pow(10,18) ).toNumber();                        
             assert.isBelow(tokensRound3_estimate,  5500001, "Should have just under 5500001 tokens");
             assert.isAbove(tokensRound3_estimate,  5499999, "Should have just over  5499999 tokens");
             
@@ -310,7 +310,7 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[8]);
 
             let new_balance_tokens = await token.balanceOf.call(accounts[8]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();
             //console.log(new_balance_tokens);
             //console.log(new_balance_tokens_estimate);
             
@@ -338,7 +338,7 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[9]);
 
             let new_balance_tokens = (await token.balanceOf.call(accounts[9])) - old_balance_tokens;
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();
             //console.log(new_balance_tokens);
             //console.log(new_balance_tokens_estimate);
             
@@ -704,7 +704,7 @@ contract('Sale Tests', accounts => {
         it("should have non-zero balance but still less than minimum goal after first successful transaction attempt", async () => {
             let minGoal = await sale.minFundingGoalWei.call();
             assert.notEqual(web3.eth.getBalance(sale.address).toNumber(), 0, "contract wei balance should not be zero");
-            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
+            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should less than minimum goal");
         });       
 
         it("should move to the second discount tranche when advancing time", async () => {
@@ -737,7 +737,7 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[2]);
 
             let new_balance_tokens = await token.balanceOf.call(accounts[2]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();
             
             assert.isBelow(new_balance_tokens_estimate, 10999773, "Should have just under 10999773 tokens");
             assert.isAbove(new_balance_tokens_estimate, 10999772, "Should have just over  10999772 tokens");
@@ -775,7 +775,7 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[3]);
 
             let new_balance_tokens = await token.balanceOf.call(accounts[3]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();
             //console.log(new_balance_tokens);
             //console.log(new_balance_tokens_estimate);
             
@@ -815,7 +815,7 @@ contract('Sale Tests', accounts => {
             let new_balance_wei = web3.eth.getBalance(accounts[4]);
 
             let new_balance_tokens = await token.balanceOf.call(accounts[4]);                                                    
-            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) );
+            let new_balance_tokens_estimate = new BigNumber(new_balance_tokens).dividedBy( Math.pow(10,18) ).toNumber();
             //console.log(new_balance_tokens);
             //console.log(new_balance_tokens_estimate);
             
@@ -1099,7 +1099,7 @@ contract('Sale Tests', accounts => {
         it("should have non-zero balance but still less than minimum goal after first successful transaction attempt", async () => {
             let minGoal = await sale.minFundingGoalWei.call();
             assert.notEqual(web3.eth.getBalance(sale.address).toNumber(), 0, "contract wei balance should not be zero");
-            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
+            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should less than minimum goal");
         });
 
         it("should move to the second discount tranche when advancing time", async () => {
@@ -1320,7 +1320,7 @@ contract('Sale Tests', accounts => {
         it("should have non-zero balance but still less than minimum goal after first successful transaction attempt", async () => {
             let minGoal = await sale.minFundingGoalWei.call();
             assert.notEqual(web3.eth.getBalance(sale.address).toNumber(), 0, "contract wei balance should not be zero");
-            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
+            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should less than minimum goal");
         });
 
         it("should move to the second discount tranche when advancing time", async () => {
@@ -1498,7 +1498,7 @@ contract('Sale Tests', accounts => {
             });
             assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
             assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
-            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should less than minimum goal");
+            assert.isBelow(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should less than minimum goal");
         });
 
         it("should equal minimum goal", async () => {
@@ -1512,7 +1512,7 @@ contract('Sale Tests', accounts => {
             });
             assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
             assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
-            assert.equal(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should equal to minimum goal");
+            assert.equal(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should equal to minimum goal");
         });
 
         it("should allow owner to transfer wei after minimum goal is met", async () => {
@@ -1572,7 +1572,7 @@ contract('Sale Tests', accounts => {
             });
             assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
             assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
-            assert.isAbove(web3.eth.getBalance(sale.address).toNumber(), minGoal, "contract wei balance should greater or equal to minimum goal");
+            assert.isAbove(web3.eth.getBalance(sale.address).toNumber(), minGoal.toNumber(), "contract wei balance should greater or equal to minimum goal");
         });
 
         it("should stop allowing contributions after the sale end date", async () => {
@@ -2067,7 +2067,7 @@ contract('Sale Tests', accounts => {
             assert(verifyEvent(hash, eventSigTransfer), "Transfer event wasn't emitted");
             assert(verifyEvent(hash, eventSigContributionReceived), "ContributionReceived event wasn't emitted");
 
-            let b = web3.eth.getBalance(sale.address);
+            let b = web3.eth.getBalance(sale.address).toNumber();
             assert.isAbove(b, 0, "no ether contributions were received");
             assert.isBelow(b, minimumGoal, "minimum goal was reached when it shouldn't have been");
         });
